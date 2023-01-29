@@ -39,6 +39,23 @@ public class UserRepositoryIT {
     }
 
     @Test
+    void shouldFindUserByUsername() {
+        Long id = 1L;
+        String username = "User 1";
+        String password = "password1";
+
+        Optional<User> result = userRepository.findByUsername(username);
+
+        assertThat(result.isPresent(), is(true));
+
+        User user = result.get();
+
+        assertThat(user.getId(), is(id));
+        assertThat(user.getUsername(), is(username));
+        assertThat(user.getPassword(), is(password));
+    }
+
+    @Test
     void shouldSaveUser() {
         User user = new User("testUser", "testPassword");
 

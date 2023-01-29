@@ -12,13 +12,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true, length = 25)
+    @Column(nullable = false, unique = true, length = 55)
     private String username;
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false)
     private String password;
 
-    protected User() {
-    }
+
+    protected User() {}
 
     public User(String username, String password) {
         this.username = username;
