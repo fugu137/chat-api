@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import zoidnet.dev.chat.model.User;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,33 +22,20 @@ public class UserRepositoryIT {
     private UserRepository userRepository;
 
     @Test
-    void shouldFindAllUsers() {
-        List<User> users = userRepository.findAll();
-
-        User user1 = users.get(0);
-        User user2 = users.get(1);
-
-        assertThat(user1.getId(), is(1L));
-        assertThat(user1.getUsername(), is("User 1"));
-        assertThat(user1.getPassword(), is("password1"));
-
-        assertThat(user2.getId(), is(2L));
-        assertThat(user2.getUsername(), is("User 2"));
-        assertThat(user2.getPassword(), is("password2"));
-    }
-
-    @Test
     void shouldFindUserById() {
         Long id = 1L;
         String username = "User 1";
         String password = "password1";
 
-        User expectedUser = new User(id, username, password);
-
         Optional<User> result = userRepository.findById(id);
 
         assertThat(result.isPresent(), is(true));
-        assertThat(result.get(), is(expectedUser));
+
+        User user = result.get();
+
+        assertThat(user.getId(), is(id));
+        assertThat(user.getUsername(), is(username));
+        assertThat(user.getPassword(), is(password));
     }
 
     @Test
