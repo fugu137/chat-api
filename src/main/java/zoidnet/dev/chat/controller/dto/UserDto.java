@@ -15,7 +15,7 @@ public record UserDto(String username, String password) {
         return this.password;
     }
 
-    public User toAccount(PasswordEncoder passwordEncoder) {
+    public User toUser(PasswordEncoder passwordEncoder) {
         return new User(username, passwordEncoder.encode(password));
     }
 }

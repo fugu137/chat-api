@@ -22,7 +22,7 @@ public class UserService {
 
 
     public void registerUser(UserDto userDto) {
-        User newUser = userDto.toAccount(passwordEncoder);
+        User newUser = userDto.toUser(passwordEncoder);
         userRepository.save(newUser);
     }
 

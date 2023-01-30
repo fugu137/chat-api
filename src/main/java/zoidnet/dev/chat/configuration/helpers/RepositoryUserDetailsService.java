@@ -18,6 +18,7 @@ public class RepositoryUserDetailsService implements org.springframework.securit
     @Autowired
     private UserRepository userRepository;
 
+
     public RepositoryUserDetailsService() {
     }
 

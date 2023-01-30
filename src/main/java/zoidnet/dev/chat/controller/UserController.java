@@ -20,6 +20,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping("/principal")
     public ResponseEntity<PrincipalDto> getPrincipal(Authentication authentication) {
         if (authentication == null) return ResponseEntity.ok(null);
@@ -35,7 +36,7 @@ public class UserController {
         try {
             userService.registerUser(userDto);
         } catch (DuplicateKeyException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

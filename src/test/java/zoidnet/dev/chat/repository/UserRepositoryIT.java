@@ -21,6 +21,7 @@ public class UserRepositoryIT {
     @Autowired
     private UserRepository userRepository;
 
+
     @Test
     void shouldFindUserById() {
         Long id = 1L;

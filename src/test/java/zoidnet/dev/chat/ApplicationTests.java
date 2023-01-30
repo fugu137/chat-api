@@ -17,12 +17,16 @@ class ApplicationTests {
 
 	@Autowired
 	private SecurityConfiguration securityConfiguration;
+
 	@Autowired
 	private UserController userController;
+
 	@Autowired
 	private UserService userService;
+
 	@Autowired
 	private UserRepository userRepository;
+
 
 	@Test
 	void contextShouldLoad() {

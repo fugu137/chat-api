@@ -36,12 +36,16 @@ public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockBean
     private UserDetailsService userDetailsService;
+
     @MockBean
     private UserService userService;
+
     @Captor
     private ArgumentCaptor<UserDto> userDtoCaptor;
+
 
     @Test
     @WithMockUser(username = "Jacqueline", roles = "ADMIN")
