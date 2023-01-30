@@ -28,19 +28,14 @@ public class AuthenticationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private UserDetailsService userDetailsService;
-
     @MockBean
     private UserRepository userRepository;
-
     @MockBean
     private UserController userController;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
 
     @Test
     void shouldReturn200AfterLoginWithValidDetails() throws Exception {

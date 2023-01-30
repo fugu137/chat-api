@@ -25,16 +25,12 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private PasswordEncoder passwordEncoder;
-
     @Captor
     private ArgumentCaptor<User> accountArgumentCaptor;
-
 
     @Test
     void shouldSaveUserWithEncodedPassword() {

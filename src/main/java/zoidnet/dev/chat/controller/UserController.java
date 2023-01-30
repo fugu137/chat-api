@@ -20,7 +20,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     @GetMapping("/principal")
     public ResponseEntity<PrincipalDto> getPrincipal(Authentication authentication) {
         if (authentication == null) return ResponseEntity.ok(null);
