@@ -23,6 +23,8 @@ public class UserController {
 
     @GetMapping("/principal")
     public ResponseEntity<PrincipalDto> getPrincipal(Authentication authentication) {
+        if (authentication == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
         UserDetails principal = (UserDetails) authentication.getPrincipal();
         PrincipalDto dto = new PrincipalDto(principal.getUsername(), principal.getAuthorities());
 
