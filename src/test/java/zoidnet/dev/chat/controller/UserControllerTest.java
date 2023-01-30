@@ -21,6 +21,7 @@ import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.service.UserService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -62,10 +63,15 @@ public class UserControllerTest {
 
     @Test
     void shouldNotGetPrincipalIfUserNotLoggedIn() throws Exception {
-        mockMvc.perform(get("/users/principal")
+        MvcResult response = mockMvc.perform(get("/users/principal")
                         .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseAsString = response.getResponse().getContentAsString();
+
+        assertThat(responseAsString, is(emptyString()));
     }
 
     @Test
