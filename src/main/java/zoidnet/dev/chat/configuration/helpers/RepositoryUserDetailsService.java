@@ -3,6 +3,7 @@ package zoidnet.dev.chat.configuration.helpers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import zoidnet.dev.chat.model.User;
@@ -13,7 +14,7 @@ import java.util.List;
 
 
 @Service
-public class RepositoryUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+public class RepositoryUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;

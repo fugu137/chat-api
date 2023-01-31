@@ -2,6 +2,7 @@ package zoidnet.dev.chat.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import zoidnet.dev.chat.controller.dto.UserDto;
@@ -21,7 +22,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
-    public void registerUser(UserDto userDto) {
+    public void registerUser(UserDto userDto) throws DataAccessException {
         User newUser = userDto.toUser(passwordEncoder);
         userRepository.save(newUser);
     }
