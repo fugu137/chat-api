@@ -1,4 +1,4 @@
-package zoidnet.dev.chat.configuration.helpers;
+package zoidnet.dev.chat.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,13 +14,13 @@ import java.util.List;
 
 
 @Service
-public class RepositoryUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
 
-    public RepositoryUserDetailsService() {
+    public CustomUserDetailsService() {
     }
 
     @Override
