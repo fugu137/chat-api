@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.dto.UserDto;
@@ -27,6 +26,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -50,28 +50,20 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = "Jacqueline", roles = "ADMIN")
     void shouldGetPrincipalIfUserLoggedIn() throws Exception {
-        MvcResult response = mockMvc.perform(get("/users/principal")
+        mockMvc.perform(get("/users/principal")
                         .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String responseAsString = response.getResponse().getContentAsString();
-
-        assertThat(responseAsString, is("{\"username\":\"Jacqueline\",\"authorities\":[{\"authority\":\"ROLE_ADMIN\"}]}"));
+                .andExpect(content().json("{\"username\":\"Jacqueline\",\"authorities\":[{\"authority\":\"ROLE_ADMIN\"}]}"));
     }
 
     @Test
     void shouldNotGetPrincipalIfUserNotLoggedIn() throws Exception {
-        MvcResult response = mockMvc.perform(get("/users/principal")
+        mockMvc.perform(get("/users/principal")
                         .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String responseAsString = response.getResponse().getContentAsString();
-
-        assertThat(responseAsString, is(emptyString()));
+                .andExpect(content().string(emptyString()));
     }
 
     @Test
@@ -80,15 +72,13 @@ public class UserControllerTest {
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        ObjectMapper mapper = new ObjectMapper();
-        String userAsJson = mapper.writeValueAsString(userDto);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        MockHttpServletRequestBuilder request = post("/users")
-                .with(csrf().asHeader())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userAsJson);
-
-        mockMvc.perform(request).andExpect(status().isCreated());
+        mockMvc.perform(post("/users")
+                        .with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isCreated());
 
         verify(userService, times(1)).registerUser(userDtoCaptor.capture());
 
