@@ -10,13 +10,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.dto.UserDto;
+import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.service.UserService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -74,6 +74,8 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
+        when(userService.registerUser(userDto)).thenReturn(new User(username, password));
+
         mockMvc.perform(post("/users")
                         .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -88,14 +90,14 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrow409ErrorIfUsernameAlreadyExists() throws Exception {
+    void shouldReturn409IfUsernameAlreadyExists() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        doThrow(new DuplicateKeyException("Username already exists")).when(userService).registerUser(userDto);
+        when(userService.registerUser(userDto)).thenReturn(null);
 
         mockMvc.perform(post("/users")
                         .with(csrf().asHeader())
@@ -105,7 +107,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrow500ErrorIfServiceThrowsNon409Error() throws Exception {
+    void shouldReturn500IfServiceThrowsError() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 

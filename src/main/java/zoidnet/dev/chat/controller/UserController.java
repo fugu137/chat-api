@@ -1,8 +1,6 @@
 package zoidnet.dev.chat.controller;
 
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import zoidnet.dev.chat.controller.dto.PrincipalDto;
 import zoidnet.dev.chat.controller.dto.UserDto;
+import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.service.UserService;
 
 
@@ -37,13 +36,14 @@ public class UserController {
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
         try {
-            userService.registerUser(userDto);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            User registeredUser = userService.registerUser(userDto);
+            if (registeredUser != null) return ResponseEntity.status(HttpStatus.CREATED).build();
 
-        } catch (DataAccessException e) {
-            if (e instanceof DuplicateKeyException) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
+        } catch (Exception e) {
+            if (e instanceof IllegalArgumentException) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -8,6 +8,8 @@ import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
 
+import java.util.Optional;
+
 
 @Service
 public class UserService {
@@ -22,9 +24,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void registerUser(UserDto userDto) throws DataAccessException {
+    public User registerUser(UserDto userDto) throws DataAccessException {
+        Optional<User> existingUser = userRepository.findByUsername(userDto.username());
+        if (existingUser.isPresent()) return null;
+
         User newUser = userDto.toUser(passwordEncoder);
-        userRepository.save(newUser);
+
+        return userRepository.save(newUser);
     }
 
 }
