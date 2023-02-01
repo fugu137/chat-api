@@ -6,11 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,8 +23,12 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import zoidnet.dev.chat.controller.dto.PrincipalDto;
+import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -34,15 +38,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final String allowedOrigins;
-
-    private final UserDetailsService userDetailsService;
-
-
-    public SecurityConfiguration(@Value("${cors.allowed.origins}") String allowedOrigins, UserDetailsService userDetailsService) {
-        this.allowedOrigins = allowedOrigins;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -50,17 +45,18 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return (String username) -> {
+            User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
+            List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-        return authenticationProvider;
+            return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        };
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(@Value("${cors.allowed.origins}") String allowedOrigins) {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
@@ -71,7 +67,6 @@ public class SecurityConfiguration {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 
