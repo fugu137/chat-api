@@ -21,14 +21,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    @InjectMocks
-    private UserService userService;
-
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private UserService userService;
 
     @Captor
     private ArgumentCaptor<User> accountArgumentCaptor;
@@ -38,18 +38,19 @@ public class UserServiceTest {
     void shouldSaveUserWithEncodedPassword() {
         String username = "testUsername";
         String password = "testPassword";
+        String encodedPassword = "encodedPassword";
 
-        UserDto dto = new UserDto(username, password);
+        UserDto userDto = new UserDto(username, password);
 
-        when(passwordEncoder.encode(password)).thenReturn("encodedPassword");
+        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
-        userService.registerUser(dto);
+        userService.registerUser(userDto);
 
         verify(userRepository, times(1)).save(accountArgumentCaptor.capture());
         User capturedUser = accountArgumentCaptor.getValue();
 
         assertThat(capturedUser.getUsername(), is(username));
-        assertThat(capturedUser.getPassword(), is("encodedPassword"));
+        assertThat(capturedUser.getPassword(), is(encodedPassword));
     }
 
 }

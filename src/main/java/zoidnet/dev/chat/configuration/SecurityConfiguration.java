@@ -1,7 +1,6 @@
 package zoidnet.dev.chat.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,13 +34,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+    private final String allowedOrigins;
 
-    @Value("${cors.allowed.origins}")
-    private String allowedOrigins;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
 
+    public SecurityConfiguration(@Value("${cors.allowed.origins}") String allowedOrigins, UserDetailsService userDetailsService) {
+        this.allowedOrigins = allowedOrigins;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

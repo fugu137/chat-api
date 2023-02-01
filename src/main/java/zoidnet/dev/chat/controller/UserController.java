@@ -1,7 +1,6 @@
 package zoidnet.dev.chat.controller;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -18,9 +17,12 @@ import zoidnet.dev.chat.service.UserService;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/principal")
     public ResponseEntity<PrincipalDto> getPrincipal(Authentication authentication) {
@@ -36,13 +38,14 @@ public class UserController {
     public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
         try {
             userService.registerUser(userDto);
-        } catch (DataAccessException e) {
-            if (e instanceof DuplicateKeyException) return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
 
+        } catch (DataAccessException e) {
+            if (e instanceof DuplicateKeyException) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

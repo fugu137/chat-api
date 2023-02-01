@@ -38,10 +38,10 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserDetailsService userDetailsService;
+    private UserService userService;
 
     @MockBean
-    private UserService userService;
+    private UserDetailsService userDetailsService;
 
     @Captor
     private ArgumentCaptor<UserDto> userDtoCaptor;

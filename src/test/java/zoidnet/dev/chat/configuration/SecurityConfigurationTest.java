@@ -11,9 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 import zoidnet.dev.chat.controller.UserController;
-import zoidnet.dev.chat.repository.UserRepository;
+import zoidnet.dev.chat.service.UserService;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -32,20 +31,14 @@ public class SecurityConfigurationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @MockBean
     private UserDetailsService userDetailsService;
 
     @MockBean
-    private UserRepository userRepository;
-
-    @MockBean
-    private UserController userController;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    private UserService userService;
 
 
     @Test

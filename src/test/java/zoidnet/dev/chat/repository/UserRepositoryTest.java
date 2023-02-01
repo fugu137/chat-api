@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql({"classpath:user-reset.sql", "classpath:user-data.sql"})
-public class UserRepositoryIT {
+public class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
