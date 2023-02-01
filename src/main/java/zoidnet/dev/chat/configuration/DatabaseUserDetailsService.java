@@ -14,13 +14,13 @@ import java.util.List;
 
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class DatabaseUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
 
-    public CustomUserDetailsService() {
+    public DatabaseUserDetailsService() {
     }
 
     @Override

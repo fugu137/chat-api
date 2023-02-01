@@ -13,8 +13,6 @@ import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
 
-import java.util.Optional;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -52,22 +50,6 @@ public class UserServiceTest {
 
         assertThat(capturedUser.getUsername(), is(username));
         assertThat(capturedUser.getPassword(), is("encodedPassword"));
-    }
-
-    @Test
-    void shouldFindUserById() {
-        Long id = 123L;
-        String username = "testUsername";
-        String password = "testPassword";
-
-        User user = new User(id, username, password);
-
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-
-        Optional<User> result = userService.findUser(id);
-
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get(), is(user));
     }
 
 }

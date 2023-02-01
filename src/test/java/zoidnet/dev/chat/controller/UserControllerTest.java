@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.service.UserService;
@@ -54,7 +54,7 @@ public class UserControllerTest {
                         .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"username\":\"Jacqueline\",\"authorities\":[{\"authority\":\"ROLE_ADMIN\"}]}"));
+                .andExpect(content().json("{ 'username': 'Jacqueline', 'authorities': [{ 'authority': 'ROLE_ADMIN' }]}"));
     }
 
     @Test
@@ -88,21 +88,37 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrowErrorIfUsernameAlreadyExists() throws Exception {
+    void shouldThrow409ErrorIfUsernameAlreadyExists() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        ObjectMapper mapper = new ObjectMapper();
-        String userAsJson = mapper.writeValueAsString(userDto);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
         doThrow(new DuplicateKeyException("Username already exists")).when(userService).registerUser(userDto);
 
-        MockHttpServletRequestBuilder request = post("/users")
-                .with(csrf().asHeader())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userAsJson);
-
-        mockMvc.perform(request).andExpect(status().isConflict());
+        mockMvc.perform(post("/users")
+                        .with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isConflict());
     }
+
+    @Test
+    void shouldThrow500ErrorIfServiceThrowsNon409Error() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+
+        doThrow(new DataIntegrityViolationException("Invalid data")).when(userService).registerUser(userDto);
+
+        mockMvc.perform(post("/users")
+                        .with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isInternalServerError());
+    }
+
 }

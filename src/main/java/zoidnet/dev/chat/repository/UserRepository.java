@@ -1,19 +1,15 @@
 package zoidnet.dev.chat.repository;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import zoidnet.dev.chat.model.User;
 
 import java.util.Optional;
 
 
-@org.springframework.stereotype.Repository
-public interface UserRepository extends Repository<User, Long> {
-
-    Optional<User> findById(Long id);
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
-
-    void save(User user) throws DataAccessException;
 
 }

@@ -3,6 +3,7 @@ package zoidnet.dev.chat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -36,7 +37,9 @@ public class UserController {
         try {
             userService.registerUser(userDto);
         } catch (DataAccessException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
+            if (e instanceof DuplicateKeyException) return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

@@ -23,23 +23,6 @@ public class UserRepositoryIT {
 
 
     @Test
-    void shouldFindUserById() {
-        Long id = 1L;
-        String username = "User 1";
-        String password = "password1";
-
-        Optional<User> result = userRepository.findById(id);
-
-        assertThat(result.isPresent(), is(true));
-
-        User user = result.get();
-
-        assertThat(user.getId(), is(id));
-        assertThat(user.getUsername(), is(username));
-        assertThat(user.getPassword(), is(password));
-    }
-
-    @Test
     void shouldFindUserByUsername() {
         Long id = 1L;
         String username = "User 1";
@@ -56,15 +39,4 @@ public class UserRepositoryIT {
         assertThat(user.getPassword(), is(password));
     }
 
-    @Test
-    void shouldSaveUser() {
-        User user = new User("testUser", "testPassword");
-
-        userRepository.save(user);
-
-        Optional<User> result = userRepository.findById(user.getId());
-
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get(), is(user));
-    }
 }
