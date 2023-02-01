@@ -32,11 +32,14 @@ tasks.withType<Test> {
 
         afterSuite(
                 KotlinClosure2({ desc: TestDescriptor, result: TestResult ->
+                    val summary = " Result: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+                    val divider = "-".repeat(summary.length + 1)
+
                     if (desc.parent == null) {
                         println()
-                        println("--------------------------------------------------------------")
-                        println("  Result: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)")
-                        println("--------------------------------------------------------------")
+                        println(divider)
+                        println(summary)
+                        println(divider)
                     }
                 })
         )
