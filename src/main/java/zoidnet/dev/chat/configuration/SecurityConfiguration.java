@@ -26,7 +26,6 @@ import zoidnet.dev.chat.controller.dto.PrincipalDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,10 +55,10 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(@Value("${cors.allowed.origins}") String allowedOrigins) {
+    public CorsConfigurationSource corsConfigurationSource(@Value("${cors.allowed.origins}") List<String> allowedOrigins) {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(singletonList("*"));
         configuration.setAllowedHeaders(singletonList("*"));
         configuration.setExposedHeaders(singletonList("Location"));
