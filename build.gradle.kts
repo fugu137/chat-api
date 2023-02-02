@@ -1,5 +1,6 @@
 plugins {
     java
+    idea
     id("org.springframework.boot") version "3.0.2"
     id("io.spring.dependency-management") version "1.1.0"
 }
@@ -12,6 +13,27 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    create("integrationTest") {
+        java {
+            setSrcDirs(listOf("src/integrationTest/java"))
+        }
+    }
+}
+
+idea {
+    module {
+        testSources.from(sourceSets["integrationTest"].java.srcDirs)
+    }
+}
+
+
+val integrationTestImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.implementation.get())
+}
+
+configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -20,7 +42,20 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    integrationTestImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
+
+val integrationTest = task<Test>("integrationTest") {
+    description = "Runs the integration tests"
+    group = "verification"
+    testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+    classpath = sourceSets["integrationTest"].runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter("test")
+}
+
+tasks.check { dependsOn(integrationTest) }
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
