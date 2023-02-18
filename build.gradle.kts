@@ -66,12 +66,13 @@ tasks.withType<Test> {
         afterSuite(
                 KotlinClosure2({ desc: TestDescriptor, result: TestResult ->
                     val summary = " Result: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-                    val divider = "-".repeat(summary.length + 1)
+                    val duration = ", Duration: ${(result.endTime - result.startTime) / 1000}s"
+                    val divider = "-".repeat(summary.length + duration.length + 1)
 
                     if (desc.parent == null) {
                         println()
                         println(divider)
-                        println(summary)
+                        println(summary + duration)
                         println(divider)
                     }
                 })
