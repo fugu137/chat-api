@@ -16,6 +16,8 @@ repositories {
 sourceSets {
     create("integrationTest") {
         java {
+            compileClasspath += main.get().output + test.get().output
+            runtimeClasspath += main.get().output + test.get().output
             setSrcDirs(listOf("src/integrationTest/java"))
         }
     }
@@ -27,11 +29,7 @@ idea {
     }
 }
 
-
-val integrationTestImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations.implementation.get())
-}
-
+configurations["integrationTestImplementation"].extendsFrom(configurations.testImplementation.get())
 configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 dependencies {
@@ -42,10 +40,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    integrationTestImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
 
-val integrationTest = task<Test>("integrationTest") {
+tasks.register<Test>("integrationTest") {
     description = "Runs the integration tests"
     group = "verification"
     testClassesDirs = sourceSets["integrationTest"].output.classesDirs
@@ -54,8 +51,9 @@ val integrationTest = task<Test>("integrationTest") {
     mustRunAfter("test")
 }
 
-tasks.check { dependsOn(integrationTest) }
-
+tasks.check {
+    dependsOn(tasks.getByName("integrationTest"))
+}
 
 tasks.withType<Test> {
     useJUnitPlatform()
