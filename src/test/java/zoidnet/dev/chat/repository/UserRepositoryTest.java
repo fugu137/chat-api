@@ -26,7 +26,7 @@ public class UserRepositoryTest {
     void shouldFindUserByUsername() {
         Long id = 1L;
         String username = "User 1";
-        String password = "password1";
+        String password = "$2a$10$iYOyoRjOzo/X/ceWh/awjezp1mH20M16z56g/DY2bWfKJ5ZPxm82.";
 
         Optional<User> result = userRepository.findByUsername(username);
 

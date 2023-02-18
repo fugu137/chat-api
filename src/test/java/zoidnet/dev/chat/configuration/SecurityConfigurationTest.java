@@ -66,7 +66,20 @@ public class SecurityConfigurationTest {
     }
 
     @Test
-    void shouldReturn401AfterLoginWithInvalidDetails() throws Exception {
+    void shouldReturn401AfterLoginWithIncorrectUsername() throws Exception {
+        String username = "username";
+        String password = "password";
+        String wrongUsername = "drowssap";
+
+        UserDetails userDetails = new User(username, passwordEncoder.encode(password), emptyList());
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+
+        mockMvc.perform(formLogin("/login").user(wrongUsername).password(password))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldReturn401AfterLoginWithIncorrectPassword() throws Exception {
         String username = "username";
         String password = "password";
         String wrongPassword = "drowssap";
