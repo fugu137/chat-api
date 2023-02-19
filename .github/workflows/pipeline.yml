@@ -36,7 +36,7 @@ jobs:
       with:
         arguments: build
     - name: Archive test results
-      if: ${{ failure() }}
+      if: always()
       uses: actions/upload-artifact@v3
       with:
         name: test-results
