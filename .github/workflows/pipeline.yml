@@ -5,49 +5,35 @@ on:
     branches: [ "master" ]
 
 jobs:
-  unitTest:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Set up Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'zulu'
-        java-version: '17'
-    - name: Run unit tests
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: test
-    
-#  integrationTest:
-#    needs: [unitTest]
-#    runs-on: ubuntu-latest
-#    steps:
-#    - name: Checkout code
-#      uses: actions/checkout@v3
-#    - name: Set up Java
-#      uses: actions/setup-java@v3
-#      with:
-#        distribution: 'zulu'
-#        java-version: '17'
-#    - name: Run integration tests
-#      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-#      with:
-#        arguments: integrationTest
-        
   build:
-    needs: [unitTest]
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: chat_db
+          POSTGRES_USER: chat_admin
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: '17'
+
     - name: Build
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
-        arguments: build --exclude-task test --exclude-task integrationTest
+        arguments: build
