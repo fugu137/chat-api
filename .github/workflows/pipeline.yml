@@ -1,18 +1,15 @@
-name: CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ "master" ]
-
-permissions:
-  contents: read
 
 jobs:
   unitTest:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-    - uses: actions/checkout@v3
+      uses: actions/checkout@v3
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
@@ -27,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-    - uses: actions/checkout@v3
+      uses: actions/checkout@v3
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
@@ -42,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-    - uses: actions/checkout@v3
+      uses: actions/checkout@v3
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
