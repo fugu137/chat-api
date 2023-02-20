@@ -9,7 +9,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.controller.UserController;
 import zoidnet.dev.chat.service.UserService;
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
+@ActiveProfiles("test")
 @WebMvcTest(UserController.class)
 @Import(SecurityConfiguration.class)
 public class SecurityConfigurationTest {
@@ -71,8 +74,7 @@ public class SecurityConfigurationTest {
         String password = "password";
         String wrongUsername = "drowssap";
 
-        UserDetails userDetails = new User(username, passwordEncoder.encode(password), emptyList());
-        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        when(userDetailsService.loadUserByUsername(wrongUsername)).thenThrow(new UsernameNotFoundException(wrongUsername));
 
         mockMvc.perform(formLogin("/login").user(wrongUsername).password(password))
                 .andExpect(status().isUnauthorized());

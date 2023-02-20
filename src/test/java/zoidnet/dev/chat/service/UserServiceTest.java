@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
@@ -18,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 

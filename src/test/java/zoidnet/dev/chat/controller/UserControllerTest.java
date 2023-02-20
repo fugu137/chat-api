@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.dto.UserDto;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
+@ActiveProfiles("test")
 @WebMvcTest(UserController.class)
 @Import(SecurityConfiguration.class)
 public class UserControllerTest {

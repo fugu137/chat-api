@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import zoidnet.dev.chat.model.User;
 
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
+@ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql({"classpath:user-reset.sql", "classpath:user-data.sql"})
@@ -28,7 +30,7 @@ public class UserRepositoryTest {
     void shouldFindUserByUsername() {
         Long id = 1L;
         String username = "User 1";
-        String password = "password1";
+        String password = "$2a$10$iYOyoRjOzo/X/ceWh/awjezp1mH20M16z56g/DY2bWfKJ5ZPxm82.";
 
         Optional<User> result = userRepository.findByUsername(username);
 
@@ -50,8 +52,8 @@ public class UserRepositoryTest {
 
     @Test
     void shouldSaveNewUser() {
-        String username = "User 2";
-        String password = "password2";
+        String username = "User 4";
+        String password = "password4";
 
         User newUser = new User(username, password);
 
