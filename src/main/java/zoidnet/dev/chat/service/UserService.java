@@ -1,7 +1,6 @@
 package zoidnet.dev.chat.service;
 
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import zoidnet.dev.chat.controller.dto.UserDto;
@@ -24,8 +23,9 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(UserDto userDto) throws DataAccessException {
+    public User registerUser(UserDto userDto) throws IllegalArgumentException {
         Optional<User> existingUser = userRepository.findByUsername(userDto.username());
+
         if (existingUser.isPresent()) return null;
 
         User newUser = userDto.toUser(passwordEncoder);
