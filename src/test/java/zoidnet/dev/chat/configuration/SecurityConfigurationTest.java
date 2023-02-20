@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -136,11 +137,32 @@ public class SecurityConfigurationTest {
         String username = "username";
         String password = "password";
 
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
         mockMvc.perform(post("/login")
                 .param("username", username)
                 .param("password", password))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
+    }
 
+    @Test
+    void shouldReturn403AfterLoginWithInvalidCsrfToken() throws Exception {
+        String username = "username";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        mockMvc.perform(post("/login")
+                        .param("username", username)
+                        .param("password", password)
+                        .with(csrf().useInvalidToken()))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

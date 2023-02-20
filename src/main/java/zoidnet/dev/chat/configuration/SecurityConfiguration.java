@@ -14,8 +14,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -73,15 +75,18 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .cors(withDefaults())
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
                 )
-                .cors(withDefaults())
+                .exceptionHandling(handler -> handler
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler(accessDeniedHandler())
+                )
                 .authorizeHttpRequests(authorise -> authorise
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/principal").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -101,6 +106,13 @@ public class SecurityConfiguration {
         return requestHandler;
     }
 
+    private AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.getWriter().write(accessDeniedException.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        };
+    }
+
     private AuthenticationSuccessHandler authenticationSuccessHandler() {
         return (request, response, authentication) -> {
             PrincipalDto principalDto = new PrincipalDto(authentication.getName(), authentication.getAuthorities());
@@ -110,7 +122,10 @@ public class SecurityConfiguration {
     }
 
     private AuthenticationFailureHandler authenticationFailureHandler() {
-        return (request, response, exception) -> response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return (request, response, exception) -> {
+            response.getWriter().write(exception.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        };
     }
 
 }

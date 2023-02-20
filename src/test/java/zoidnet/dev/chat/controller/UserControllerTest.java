@@ -53,7 +53,7 @@ public class UserControllerTest {
     @WithMockUser(username = "Jacqueline", roles = "ADMIN")
     void shouldGetPrincipalIfUserLoggedIn() throws Exception {
         mockMvc.perform(get("/users/principal")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{ 'username': 'Jacqueline', 'authorities': [{ 'authority': 'ROLE_ADMIN' }]}"));
@@ -62,9 +62,9 @@ public class UserControllerTest {
     @Test
     void shouldNotGetPrincipalIfUserNotLoggedIn() throws Exception {
         mockMvc.perform(get("/users/principal")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isUnauthorized())
                 .andExpect(content().string(emptyString()));
     }
 
