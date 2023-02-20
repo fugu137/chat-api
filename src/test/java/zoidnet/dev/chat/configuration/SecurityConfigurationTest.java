@@ -1,24 +1,28 @@
 package zoidnet.dev.chat.configuration;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import zoidnet.dev.chat.controller.UserController;
-import zoidnet.dev.chat.service.UserService;
+import zoidnet.dev.chat.Application;
+import zoidnet.dev.chat.controller.dto.UserDto;
+import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.repository.UserRepository;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.mockito.Mockito.when;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ActiveProfiles("test")
-@WebMvcTest(UserController.class)
+@WebMvcTest(Application.class)
 @Import(SecurityConfiguration.class)
 public class SecurityConfigurationTest {
 
@@ -37,20 +41,51 @@ public class SecurityConfigurationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @MockBean
-    private UserService userService;
+    private UserRepository userRepository;
 
+    @Captor
+    private ArgumentCaptor<String> argumentCaptor;
+
+
+    @Test
+    void userDetailsServiceShouldLoadUserFromDatabase() {
+        String username = "username";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        userDetailsService.loadUserByUsername(username);
+
+        verify(userRepository, times(1)).findByUsername(argumentCaptor.capture());
+
+        assertThat(argumentCaptor.getValue(), is(username));
+    }
+
+    @Test
+    void userDetailsServiceShouldThrowIfUsernameDoesNotExist() {
+        String username = "wrongUsername";
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(username));
+    }
 
     @Test
     void shouldReturn200AfterLoginWithValidDetails() throws Exception {
         String username = "username";
         String password = "password";
 
-        UserDetails userDetails = new User(username, passwordEncoder.encode(password), singletonList(new SimpleGrantedAuthority("USER")));
-        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
                 .andExpect(status().isOk());
@@ -59,22 +94,23 @@ public class SecurityConfigurationTest {
     @Test
     void shouldReturnLoggedInUserAfterLoginWithValidDetails() throws Exception {
         String username = "Freddie";
-        String password = "password";
+        String password = "chicken";
 
-        UserDetails userDetails = new User(username, passwordEncoder.encode(password), singletonList(new SimpleGrantedAuthority("SUPER_USER")));
-        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
-                .andExpect(content().json("{ 'username': 'Freddie', 'authorities': [{ 'authority': 'SUPER_USER' }] }"));
+                .andExpect(content().json("{ 'username': 'Freddie', 'authorities': [{ 'authority': 'ROLE_USER' }] }"));
     }
 
     @Test
     void shouldReturn401AfterLoginWithIncorrectUsername() throws Exception {
-        String username = "username";
-        String password = "password";
         String wrongUsername = "drowssap";
+        String password = "password";
 
-        when(userDetailsService.loadUserByUsername(wrongUsername)).thenThrow(new UsernameNotFoundException(wrongUsername));
+        when(userRepository.findByUsername(wrongUsername)).thenReturn(Optional.empty());
 
         mockMvc.perform(formLogin("/login").user(wrongUsername).password(password))
                 .andExpect(status().isUnauthorized());
@@ -86,8 +122,10 @@ public class SecurityConfigurationTest {
         String password = "password";
         String wrongPassword = "drowssap";
 
-        UserDetails userDetails = new User(username, passwordEncoder.encode(password), emptyList());
-        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(formLogin("/login").user(username).password(wrongPassword))
                 .andExpect(status().isUnauthorized());

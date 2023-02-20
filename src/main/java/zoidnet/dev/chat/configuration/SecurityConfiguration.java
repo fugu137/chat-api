@@ -48,6 +48,7 @@ public class SecurityConfiguration {
         return (String username) -> {
             User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
+            //TODO: get role from user
             List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);

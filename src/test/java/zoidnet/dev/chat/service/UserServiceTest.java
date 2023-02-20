@@ -33,7 +33,7 @@ public class UserServiceTest {
     private UserService userService;
 
     @Captor
-    private ArgumentCaptor<User> accountArgumentCaptor;
+    private ArgumentCaptor<User> userArgumentCaptor;
 
 
     @Test
@@ -48,8 +48,8 @@ public class UserServiceTest {
 
         userService.registerUser(userDto);
 
-        verify(userRepository, times(1)).save(accountArgumentCaptor.capture());
-        User capturedUser = accountArgumentCaptor.getValue();
+        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+        User capturedUser = userArgumentCaptor.getValue();
 
         assertThat(capturedUser.getUsername(), is(username));
         assertThat(capturedUser.getPassword(), is(encodedPassword));
