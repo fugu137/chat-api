@@ -6,13 +6,11 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import zoidnet.dev.chat.Application;
 import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
@@ -32,8 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ActiveProfiles("test")
-@WebMvcTest(Application.class)
-@Import(SecurityConfiguration.class)
+@WebMvcTest(SecurityConfiguration.class)
 public class SecurityConfigurationTest {
 
     @Autowired
