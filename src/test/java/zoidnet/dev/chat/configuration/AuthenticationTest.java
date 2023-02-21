@@ -74,7 +74,7 @@ public class AuthenticationTest {
 
         mockMvc.perform(formLogin("/login").user(wrongUsername).password(password))
                 .andExpect(status().isUnauthorized())
-                .andExpect(status().reason("Bad credentials"));
+                .andExpect(content().string("Bad credentials"));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class AuthenticationTest {
 
         mockMvc.perform(formLogin("/login").user(username).password(wrongPassword))
                 .andExpect(status().isUnauthorized())
-                .andExpect(status().reason("Bad credentials"));
+                .andExpect(content().string("Bad credentials"));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class AuthenticationTest {
                         .param("username", username)
                         .param("password", password))
                 .andExpect(status().isForbidden())
-                .andExpect(status().reason("Could not verify the provided CSRF token because no token was found to compare."));
+                .andExpect(content().string("Could not verify the provided CSRF token because no token was found to compare."));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class AuthenticationTest {
                         .param("password", password)
                         .with(csrf().useInvalidToken()))
                 .andExpect(status().isForbidden())
-                .andExpect(status().reason("Invalid CSRF Token 'AQEBYGNi' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'."));
+                .andExpect(content().string("Invalid CSRF Token 'AQEBYGNi' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'."));
     }
 
     @Test

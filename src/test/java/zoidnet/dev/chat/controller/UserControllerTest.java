@@ -79,7 +79,7 @@ public class UserControllerTest {
         when(userService.registerUser(userDto)).thenReturn(new User(username, password));
 
         mockMvc.perform(post("/users")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isCreated());
@@ -102,10 +102,41 @@ public class UserControllerTest {
         when(userService.registerUser(userDto)).thenReturn(null);
 
         mockMvc.perform(post("/users")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void shouldReturn403IfCsrfTokenIsMissing() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("Could not verify the provided CSRF token because no token was found to compare."));
+    }
+
+    @Test
+    void shouldReturn403IfCsrfTokenIsInvalid() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+
+        mockMvc.perform(post("/users")
+                        .with(csrf().useInvalidToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("Invalid CSRF Token 'AQEBYGNi' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'."));
     }
 
     @Test
@@ -119,7 +150,7 @@ public class UserControllerTest {
         doThrow(new DataIntegrityViolationException("Invalid data")).when(userService).registerUser(userDto);
 
         mockMvc.perform(post("/users")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isInternalServerError());
