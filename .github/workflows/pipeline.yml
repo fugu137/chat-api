@@ -24,12 +24,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: Unit test results
+          name: unit test results
           path: build/reports/tests/test
 
   integrationTest:
     name: Integration Test
-    needs: unitTest
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -61,12 +60,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: Integration test results
+          name: integration test results
           path: build/reports/tests/integrationTest
 
   build:
     name: Build
-    needs: integrationTest
+    needs: [ unitTest, integrationTest ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -84,5 +83,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: Build artifacts
-          path: build/libs/chat.api-0.0.1-SNAPSHOT.jar
+          name: build artifacts
+          path: build/libs/
