@@ -6,7 +6,7 @@ on:
 
 jobs:
   unitTest:
-    name: Unit Tests
+    name: Unit test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,7 +16,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: Run integration tests
+      - name: Run unit tests
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: test
@@ -24,11 +24,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: test-results
+          name: Test results
           path: build/reports/tests/test
 
   integrationTest:
-    name: IntegrationTests
+    name: Integration test
     needs: unitTest
     runs-on: ubuntu-latest
     services:
@@ -61,5 +61,27 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: test-results
+          name: Test results
           path: build/reports/tests/integrationTest
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: Build
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: clean build --exclude-task check
+      - name: Archive build artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build artifacts
+          path: build/libs
