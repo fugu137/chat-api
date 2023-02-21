@@ -12,8 +12,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: chat_db
-          POSTGRES_USER: chat_admin
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_admin
           POSTGRES_PASSWORD: password
         options: >-
           --health-cmd pg_isready
