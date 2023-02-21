@@ -107,10 +107,7 @@ public class SecurityConfiguration {
     }
 
     private AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            response.getWriter().write(accessDeniedException.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        };
+        return (request, response, exception) -> response.sendError(HttpStatus.FORBIDDEN.value(), exception.getMessage());
     }
 
     private AuthenticationSuccessHandler authenticationSuccessHandler() {
@@ -122,10 +119,7 @@ public class SecurityConfiguration {
     }
 
     private AuthenticationFailureHandler authenticationFailureHandler() {
-        return (request, response, exception) -> {
-            response.getWriter().write(exception.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        };
+        return (request, response, exception) -> response.sendError(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
     }
 
 }

@@ -1,13 +1,10 @@
 package zoidnet.dev.chat.configuration;
 
+
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,10 +14,7 @@ import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -31,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @WebMvcTest(SecurityConfiguration.class)
-public class SecurityConfigurationTest {
+public class AuthenticationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,41 +33,9 @@ public class SecurityConfigurationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-
     @MockBean
     private UserRepository userRepository;
 
-    @Captor
-    private ArgumentCaptor<String> argumentCaptor;
-
-
-    @Test
-    void userDetailsServiceShouldLoadUserFromDatabase() {
-        String username = "username";
-        String password = "password";
-
-        UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder);
-
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-
-        userDetailsService.loadUserByUsername(username);
-
-        verify(userRepository, times(1)).findByUsername(argumentCaptor.capture());
-
-        assertThat(argumentCaptor.getValue(), is(username));
-    }
-
-    @Test
-    void userDetailsServiceShouldThrowIfUsernameDoesNotExist() {
-        String username = "wrongUsername";
-
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(username));
-    }
 
     @Test
     void shouldReturn200AfterLoginWithValidDetails() throws Exception {
@@ -111,7 +73,8 @@ public class SecurityConfigurationTest {
         when(userRepository.findByUsername(wrongUsername)).thenReturn(Optional.empty());
 
         mockMvc.perform(formLogin("/login").user(wrongUsername).password(password))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(status().reason("Bad credentials"));
     }
 
     @Test
@@ -126,7 +89,8 @@ public class SecurityConfigurationTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(formLogin("/login").user(username).password(wrongPassword))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(status().reason("Bad credentials"));
     }
 
     @Test
@@ -140,9 +104,10 @@ public class SecurityConfigurationTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(post("/login")
-                .param("username", username)
-                .param("password", password))
-        .andExpect(status().isUnauthorized());
+                        .param("username", username)
+                        .param("password", password))
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason("Could not verify the provided CSRF token because no token was found to compare."));
     }
 
     @Test
@@ -159,7 +124,8 @@ public class SecurityConfigurationTest {
                         .param("username", username)
                         .param("password", password)
                         .with(csrf().useInvalidToken()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason("Invalid CSRF Token 'AQEBYGNi' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'."));
     }
 
     @Test
