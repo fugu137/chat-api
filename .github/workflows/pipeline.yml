@@ -6,7 +6,7 @@ on:
 
 jobs:
   unitTest:
-    name: Unit test
+    name: Unit Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,15 +20,15 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: test
-      - name: Archive test results
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: Test results
+          name: Unit test results
           path: build/reports/tests/test
 
   integrationTest:
-    name: Integration test
+    name: Integration Test
     needs: unitTest
     runs-on: ubuntu-latest
     services:
@@ -57,11 +57,11 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: integrationTest
-      - name: Archive test results
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: Test results
+          name: Integration test results
           path: build/reports/tests/integrationTest
 
   build:
@@ -80,9 +80,9 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: clean build --exclude-task check
-      - name: Archive build artifact
+      - name: Upload build artifact
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: Build artifacts
-          path: build/libs
+          path: build/libs/chat.api-0.0.1-SNAPSHOT.jar
