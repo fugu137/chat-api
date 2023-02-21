@@ -3,8 +3,6 @@ package zoidnet.dev.chat.configuration;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -34,9 +32,6 @@ public class UserDetailsServiceTest {
     @SpyBean
     private UserRepository userRepository;
 
-    @Captor
-    private ArgumentCaptor<String> argumentCaptor;
-
 
     @Test
     void userDetailsServiceShouldLoadUserFromDatabase() {
@@ -45,9 +40,7 @@ public class UserDetailsServiceTest {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        verify(userRepository, times(1)).findByUsername(argumentCaptor.capture());
-
-        assertThat(argumentCaptor.getValue(), is(username));
+        verify(userRepository, times(1)).findByUsername(username);
 
         assertThat(userDetails.getUsername(), is(username));
         assertThat(userDetails.getPassword(), is(password));

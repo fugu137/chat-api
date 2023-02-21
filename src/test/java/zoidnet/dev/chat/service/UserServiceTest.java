@@ -14,8 +14,11 @@ import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 
@@ -49,10 +52,27 @@ public class UserServiceTest {
         userService.registerUser(userDto);
 
         verify(userRepository, times(1)).save(userArgumentCaptor.capture());
-        User capturedUser = userArgumentCaptor.getValue();
+        User capturedArgument = userArgumentCaptor.getValue();
 
-        assertThat(capturedUser.getUsername(), is(username));
-        assertThat(capturedUser.getPassword(), is(encodedPassword));
+        assertThat(capturedArgument.getUsername(), is(username));
+        assertThat(capturedArgument.getPassword(), is(encodedPassword));
+    }
+
+    @Test
+    void shouldNotSaveUserIfUsernameAlreadyExists() {
+        String username = "duplicateUsername";
+        String password = "testPassword";
+        String encodedPassword = "encodedPassword";
+
+        UserDto userDto = new UserDto(username, password);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User(username, encodedPassword)));
+
+        User savedUser = userService.registerUser(userDto);
+
+        verify(userRepository, never()).save(any());
+
+        assertNull(savedUser);
     }
 
 }
