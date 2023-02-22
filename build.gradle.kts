@@ -43,6 +43,10 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 }
 
+tasks.getByName<Jar>("jar") {
+    enabled = false
+}
+
 tasks.register<Test>("integrationTest") {
     description = "Runs the integration tests"
     group = "verification"
