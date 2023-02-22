@@ -5,30 +5,8 @@ on:
     branches: [ "master" ]
 
 jobs:
-  unitTest:
-    name: Unit Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-      - name: Run unit tests
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: test
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit test results
-          path: build/reports/tests/test
-
-  integrationTest:
-    name: Integration Test
+  build:
+    name: Test and Build
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -52,36 +30,13 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: Run integration tests
+      - name: Test and build
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: integrationTest
+          arguments: clean build
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: integration test results
-          path: build/reports/tests/integrationTest
-
-  build:
-    name: Build
-    needs: [ unitTest, integrationTest ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-      - name: Build
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: clean build --exclude-task check
-      - name: Upload build artifact
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: build artifacts
-          path: build/libs/
+          name: test results
+          path: build/reports/tests
