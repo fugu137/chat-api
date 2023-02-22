@@ -65,7 +65,7 @@ this argument the application won't run.*
 <details>
    <summary>Docker</summary>
 
-// TODO: setup docker
+// TODO: setup docker and update
 
 </details>
 
