@@ -1,27 +1,35 @@
-# Readme
+# Chat Service
 
-## Local Development
+## 1. Running the application
 
-### 1. Running the application
+You will need to create a .env file with the following fields at the project root to configure the database:
+   
+   ```properties
+   SPRING_PROFILES_ACTIVE = <Spring profile to run ('local' for local development)>
+   # If running your own database these fields should match your database credentials
+   POSTGRES_DB = <PostgreSQL database name>
+   POSTGRES_USER = <PostgreSQL username>
+   POSTGRES_PASSWORD = <PostgreSQL password>
+   ```
 
 To run the application execute the following command from the project root:
-
+ 
    ```zsh
    ./gradlew run
    ```
 
-Alternatively, you can use your IDE's inbuilt tooling. For example, in Intellij you can right-click on Application.java
+Alternatively, you can use your IDE's in-built tooling. For example, in Intellij you can right-click on Application.java
 and then click `Run Application.main()`.
 
-For the application to work with these commands you will also need set up local databases (see below).
+For the application to work with these commands you will need set up a local database (see below).
 
 <details>
-   <summary>Setting up the local databases</summary>
+   <summary><u>Setting up the local databases</u></summary>
 
 You will need to create two local PostgreSQL databases: one for local development, and one for running the integration
 tests.
 
-<u>Instructions:</u>
+Instructions:
 
 1. If you don't already have PostgreSQL installed, download and install it
    from [here](https://www.postgresql.org/download/).
@@ -46,7 +54,8 @@ tests.
 
 </details>
 
-If you don't want to do this you can run the entire application, with databases, in Docker containers using:
+If you don't want to set up the databases yourself you can run the entire application, with databases, in Docker containers using:
+  
    ```zsh
    ./gradle dockerRun
    ```
