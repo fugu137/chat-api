@@ -47,13 +47,49 @@ tasks.getByName<Jar>("jar") {
     enabled = false
 }
 
+tasks.register<GradleBuild>("run") {
+    description = "Runs the application. Note that a PostgreSQL database is required for the application to work. See README.md for instructions."
+    group = "execution"
+
+    tasks = listOf("clean", "assemble")
+
+    doLast {
+        exec {
+            val projectDirectory = layout.projectDirectory
+            val buildDirectory = projectDirectory.file("build/libs").asFile
+
+            val collection = projectDirectory.files({ buildDirectory.listFiles() })
+            val path = collection.find { file -> file.name.endsWith(".jar") }
+                    ?: throw GradleException("Could not find .jar file to run.")
+
+            commandLine("java", "-jar", path)
+        }
+    }
+}
+
+tasks.register<GradleBuild>("dockerRun") {
+    description = "Runs the application and database in Docker containers."
+    group = "execution"
+
+    tasks = listOf("clean", "assemble")
+
+    doLast {
+        exec {
+            commandLine("systemctl", "--user", "start", "docker-desktop")
+            commandLine("docker", "compose", "up", "--build")
+        }
+    }
+}
+
 tasks.register<Test>("integrationTest") {
-    description = "Runs the integration tests"
+    description = "Runs the integration tests."
     group = "verification"
+
+    mustRunAfter("test")
+
     testClassesDirs = sourceSets["integrationTest"].output.classesDirs
     classpath = sourceSets["integrationTest"].runtimeClasspath
     outputs.upToDateWhen { false }
-    mustRunAfter("test")
 }
 
 tasks.check {

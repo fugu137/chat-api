@@ -2,18 +2,32 @@
 
 ## Local Development
 
-### 1. Setting up the local databases
+### 1. Running the application
+
+To run the application execute the following command from the project root:
+
+   ```zsh
+   ./gradlew run
+   ```
+
+Alternatively, you can use your IDE's inbuilt tooling. For example, in Intellij you can right-click on Application.java
+and then click `Run Application.main()`.
+
+For the application to work with these commands you will also need set up local databases (see below).
+
+<details>
+   <summary>Setting up the local databases</summary>
 
 You will need to create two local PostgreSQL databases: one for local development, and one for running the integration
 tests.
 
-#### Instructions:
+<u>Instructions:</u>
 
 1. If you don't already have PostgreSQL installed, download and install it
    from [here](https://www.postgresql.org/download/).
 2. Run postgres using your system account. For example, in Linux run the following command:
    ```zsh
-   $ sudo -u postgres psql
+   sudo -u postgres psql
    ```
 3. Create a local user and database:
    ```
@@ -30,65 +44,29 @@ tests.
    postgres=# CREATE DATABASE test_db OWNER test_admin;
    ```
 
-### 2. Running the application
-
-You can run the application in one of three ways:
-
-<details>
-   <summary>IDE</summary>
-
-If your IDE supports it right click on Application.java and run `Application.main()`. This should work
-in IntelliJ and other popular IDEs.
-
 </details>
 
-<details>
-   <summary>Command-Line</summary>
-
-First build the application using Gradle Wrapper:
-
+If you don't want to do this you can run the entire application, with databases, in Docker containers using:
    ```zsh
-   $ ./gradlew clean build
+   ./gradle dockerRun
    ```
 
-This will create a .jar file at `build/libs/chat.api-0.0.1-SNAPSHOT.jar`. This file can then be executed:
-
-   ```zsh
-   $ java -jar build/libs/chat.api-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
-   ```
-
-*Important: don't forget to add `--spring.profiles.active=local`. Without
-this argument the application won't run.*
-
-</details>
-
-<details>
-   <summary>Docker</summary>
-
-// TODO: setup docker and update
-
-</details>
-
-*Note: the first two methods require that you setup a local user and PostgreSQL database (
-see [1. Setting up the local databases](#1-setting-up-the-local-databases)). Alternatively you can run a database with
-the same details in a [Docker container](https://hub.docker.com/_/postgres).*
-
-### 3. Running the tests
+### 2. Running the tests
 
 The application comes with a full suite of unit tests and integration tests. The unit tests can be run with the command:
 
    ```zsh
-   $ ./gradlew test
+   ./gradlew test
    ```
 
 The integration tests can be run with the command:
 
    ```zsh
-   $ ./gradlew integrationTest
+   ./gradlew integrationTest
    ```
 
 If you want to run all of the tests, run:
 
    ```zsh
-   $ ./gradlew check
+   ./gradlew check
    ```
