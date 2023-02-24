@@ -1,6 +1,7 @@
 # Chat Service
 
-If you just want to run the chat service without running tests and you have Docker installed, you can use the `dockerRun` Gradle taks:
+If you just want to run the chat service without running tests and you have Docker installed, you can use
+the `dockerRun` Gradle task:
 
 ```zsh
 ./gradlew dockerRun
@@ -12,7 +13,7 @@ chat service will be available at `localhost:8080`.
 <details>
 <summary><u>Run the chat service without cloning the git repository</u></summary>
 
-If you don't want to clone this git repository, you can run the chat service using `docker compose` and Docker images 
+If you don't want to clone this git repository, you can run the chat service using `docker compose` and Docker images
 stored in DockerHub. (Coming soon.)
 
 [comment]: <> (TODO: add docker-compose file and/or link once it's ready)
@@ -29,12 +30,12 @@ To configure the two databases, create a .env file at the project root, with the
    ```properties
    # Sets the active Spring profile. Should be set to 'local' for local development.
    SPRING_PROFILES_ACTIVE=local
-   
+
    # Credentials for the main database used for local development. Values are for illustration purposes.
    POSTGRES_DB=chat_db
    POSTGRES_USER=chat_admin
    POSTGRES_PASSWORD=password
-   
+
    # Credentials for the test database used for integration testing. Sample values below. Values are for illustration purposes.
    TEST_POSTGRES_DB=test_db
    TEST_POSTGRES_USER=test_admin
@@ -63,7 +64,13 @@ With the configuration in place, create two PostgreSQL databases with matching c
    \password postgres
    ```
 
-4. Run the Gradle task `initialiseDBs` to create the databases from the values you set in the .env file:
+4. Configure Postgres to allow connection with username and password. To do this,
+    - Find your `pg_hba.conf` configuration file. The location of this file varies depending on operating system so you
+      will have to look in the documentation. (In some Linux distributions it is located
+      at `/var/lib/pgsql/data/pg_hba.conf`.)
+    - Edit the file that all local and host databases have their METHOD set to `md5` rather than `ident` or `peer`.
+    - Save the file and restart PostgreSQL. (In Linux the command is `sudo systemctl restart postgresql`.)
+5. Run the Gradle task `initialiseDBs` to create the databases from the values you set in the .env file:
 
    ```zsh
    ./gradlew initialiseDBs
