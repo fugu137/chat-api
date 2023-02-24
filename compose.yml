@@ -2,7 +2,6 @@ version: "3.8"
 
 services:
   database:
-    container_name: database
     image: postgres:15.2-alpine3.17
     ports:
       - "5000:5432"
@@ -13,7 +12,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     healthcheck:
-      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      test: pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}
       interval: 5s
       timeout: 5s
       retries: 5
