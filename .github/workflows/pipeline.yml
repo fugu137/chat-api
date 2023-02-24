@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres
+        image: postgres:15.2-alpine3.17
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_admin
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
+          POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -34,11 +34,15 @@ jobs:
           java-version: '17'
       - name: Test and build
         uses: gradle/gradle-build-action@v2
+        env:
+          TEST_POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
+          TEST_POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
+          TEST_POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
         with:
           arguments: clean build
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: test results
+          name: Test Results
           path: build/reports/tests
