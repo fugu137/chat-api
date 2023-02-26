@@ -34,7 +34,7 @@ public class UserDetailsServiceTest {
 
 
     @Test
-    void userDetailsServiceShouldLoadUserFromDatabase() {
+    void shouldLoadUserFromDatabase() {
         String username = "User 1";
         String password = "$2a$10$iYOyoRjOzo/X/ceWh/awjezp1mH20M16z56g/DY2bWfKJ5ZPxm82.";
 
@@ -47,7 +47,7 @@ public class UserDetailsServiceTest {
     }
 
     @Test
-    void userDetailsServiceShouldThrowIfUsernameDoesNotExist() {
+    void shouldThrowIfUsernameDoesNotExist() {
         String username = "wrongUsername";
 
         assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(username));

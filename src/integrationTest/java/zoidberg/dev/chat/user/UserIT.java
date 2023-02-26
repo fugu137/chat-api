@@ -43,7 +43,7 @@ public class UserIT {
     }
 
     @Test
-    public void shouldNotLoginWithNonExistentUser() throws Exception {
+    void shouldNotLoginWithNonExistentUser() throws Exception {
         String username = "Non-existent User";
         String password = "password";
 
@@ -52,7 +52,7 @@ public class UserIT {
     }
 
     @Test
-    public void shouldNotLoginWithIncorrectPassword() throws Exception {
+    void shouldNotLoginWithIncorrectPassword() throws Exception {
         String username = "User 1";
         String password = "wrongPassword";
 
@@ -69,14 +69,14 @@ public class UserIT {
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
         mockMvc.perform(post("/users")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isCreated());
     }
 
     @Test
-    public void shouldNotCreateNewUserIfUsernameAlreadyExists() throws Exception {
+    void shouldNotCreateNewUserIfUsernameAlreadyExists() throws Exception {
         String username = "User 1";
         String password = "differentPassword";
 
@@ -84,7 +84,7 @@ public class UserIT {
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
         mockMvc.perform(post("/users")
-                        .with(csrf().asHeader())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isConflict());
