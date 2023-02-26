@@ -25,7 +25,7 @@ POSTGRES_USER=chat_admin
 POSTGRES_PASSWORD=password
 ```
 
-This will spin up a database and the chat service in separate Docker containers and set up the networking between them.
+This will spin up a database and the API in separate Docker containers and set up the networking between them.
 The chat service will be available at `http://localhost:8080`.
 
 By default, it will be configured to allow CORS from `http://localhost:3000`. If you want to allow requests from

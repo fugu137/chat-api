@@ -1,4 +1,7 @@
 Dockerfile
 **/*.log
+.idea
 .git
 .gitignore
+.github
+.gradle
