@@ -8,7 +8,7 @@ COPY /gradle/ /app/gradle/
 
 WORKDIR /app/
 
-RUN ./gradlew build --exclude-task bootJar --info
+RUN ./gradlew build --info || true
 
 COPY /src/ /app/src/
 
