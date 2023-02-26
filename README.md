@@ -1,4 +1,8 @@
-# Chat Service
+# Chat Service ![status: in progress](https://badgen.net/badge/status/in%20progress/orange) ![release](https://badgen.net/github/release/fugu137/chat-api) 
+
+![CI/CD Pipeline](https://github.com/fugu137/chat-api/actions/workflows/pipeline.yml/badge.svg)
+
+___
 
 The chat service consists of a Spring application and a database. If you don't want to do any local development and
 just want to run the application see [Running the Application in Docker](#running-the-application-in-docker) below. If
@@ -16,8 +20,7 @@ docker compose up
 ```
 
 You will need to provide a _database name_, _username_, and _password_ by setting environment variables. The easiest way
-to do
-this is to create an .env file at your project root with the following fields (sample values included):
+to do this is to create an .env file at your project root with the following fields (sample values included):
 
 ```properties
 POSTGRES_DB=chat_db
@@ -34,7 +37,7 @@ added to your .env file.)
 
 *_Note: if all you want to do is run the application in Docker there is no need to clone this repository. You can just
 download or copy the `docker-compose.yml` file and follow the instructions above. Docker compose will pull an image from
-DockerHub and use that to run the chat service, rather than building the image from the codebase._
+[DockerHub](https://hub.docker.com/repository/docker/fugu137/chat-service) and use that to run the chat service, rather than building the image from the codebase._
 
 ## Local Development
 
