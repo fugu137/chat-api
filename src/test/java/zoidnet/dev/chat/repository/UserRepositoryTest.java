@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.Role;
 
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class UserRepositoryTest {
 
     @Test
     void shouldFindUserByUsername() {
-        Long id = 1L;
+        Long id = 2L;
         String username = "User 1";
         String password = "$2a$10$iYOyoRjOzo/X/ceWh/awjezp1mH20M16z56g/DY2bWfKJ5ZPxm82.";
 
@@ -41,6 +42,25 @@ public class UserRepositoryTest {
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
+        assertThat(user.getRole(), is(Role.USER));
+    }
+
+    @Test
+    void shouldFindAdminByUsername() {
+        Long id = 1L;
+        String username = "Admin";
+        String password = "$2a$10$zVd5EoYxTPKOoj6sGrYvAud86v5oF/l5TlYg4MAEvNt9Ct.Db91O.";
+
+        Optional<User> result = userRepository.findByUsername(username);
+
+        assertThat(result.isPresent(), is(true));
+
+        User user = result.get();
+
+        assertThat(user.getId(), is(id));
+        assertThat(user.getUsername(), is(username));
+        assertThat(user.getPassword(), is(password));
+        assertThat(user.getRole(), is(Role.ADMIN));
     }
 
     @Test
@@ -52,10 +72,10 @@ public class UserRepositoryTest {
 
     @Test
     void shouldSaveNewUser() {
-        String username = "User 4";
-        String password = "password4";
+        String username = "User 3";
+        String password = "password3";
 
-        User newUser = new User(username, password);
+        User newUser = new User(username, password, Role.USER);
 
         User result = userRepository.save(newUser);
 
@@ -67,7 +87,7 @@ public class UserRepositoryTest {
         String username = "User 1";
         String password = "password";
 
-        User newUser = new User(username, password);
+        User newUser = new User(username, password, Role.USER);
 
         assertThrows(DataIntegrityViolationException.class, () -> userRepository.save(newUser));
     }

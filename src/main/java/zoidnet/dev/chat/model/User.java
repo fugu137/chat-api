@@ -19,18 +19,24 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
 
     protected User() {}
 
-    public User(String username, String password) {
+    public User(String username, String password, Role role) {
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
-    public User(Long id, String username, String password) {
+    public User(Long id, String username, String password, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
     public Long getId() {
@@ -57,9 +63,17 @@ public class User {
         this.password = password;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
-        return String.format("id: %d, username: %s, password: %s", this.id, this.username, this.password);
+        return String.format("id: %d, username: %s, password: %s, role: %s", this.id, this.username, this.password, this.role);
     }
 
     @Override
@@ -67,7 +81,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id.equals(user.id) && username.equals(user.username) && password.equals(user.password);
+        return id.equals(user.id) && username.equals(user.username) && password.equals(user.password) && role.equals(user.role);
     }
 
     @Override

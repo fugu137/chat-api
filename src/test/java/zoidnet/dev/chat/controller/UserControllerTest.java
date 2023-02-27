@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.Role;
 import zoidnet.dev.chat.service.UserService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -76,7 +77,7 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        when(userService.registerUser(userDto)).thenReturn(new User(username, password));
+        when(userService.registerUser(userDto)).thenReturn(new User(username, password, Role.USER));
 
         mockMvc.perform(post("/users")
                         .with(csrf())

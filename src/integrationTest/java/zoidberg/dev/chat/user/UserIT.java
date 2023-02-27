@@ -43,6 +43,16 @@ public class UserIT {
     }
 
     @Test
+    public void shouldLoginWithExistingAdmin() throws Exception {
+        String username = "Admin";
+        String password = "adminPassword";
+
+        mockMvc.perform(formLogin("/login").user(username).password(password))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{ 'username': 'Admin', 'authorities': [{ 'authority': 'ROLE_ADMIN' }] }"));
+    }
+
+    @Test
     void shouldNotLoginWithNonExistentUser() throws Exception {
         String username = "Non-existent User";
         String password = "password";

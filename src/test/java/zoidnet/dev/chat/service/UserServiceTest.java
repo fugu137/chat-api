@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.Role;
 import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Optional;
@@ -59,6 +60,24 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldSaveUserWithDefaultUserRole() {
+        String username = "testUsername";
+        String password = "testPassword";
+        String encodedPassword = "encodedPassword";
+
+        UserDto userDto = new UserDto(username, password);
+
+        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+
+        userService.registerUser(userDto);
+
+        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+        User capturedArgument = userArgumentCaptor.getValue();
+
+        assertThat(capturedArgument.getRole(), is(Role.USER));
+    }
+
+    @Test
     void shouldNotSaveUserIfUsernameAlreadyExists() {
         String username = "duplicateUsername";
         String password = "testPassword";
@@ -66,7 +85,7 @@ public class UserServiceTest {
 
         UserDto userDto = new UserDto(username, password);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User(username, encodedPassword)));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User(username, encodedPassword, Role.USER)));
 
         User savedUser = userService.registerUser(userDto);
 
