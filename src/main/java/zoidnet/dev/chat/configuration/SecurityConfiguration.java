@@ -28,8 +28,8 @@ import zoidnet.dev.chat.controller.dto.PrincipalDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -51,7 +51,7 @@ public class SecurityConfiguration {
             User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().asAuthority());
-            List<SimpleGrantedAuthority> authorities = Collections.singletonList(authority);
+            Set<SimpleGrantedAuthority> authorities = Set.of(authority);
 
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
         };

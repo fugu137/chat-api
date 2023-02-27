@@ -1,35 +1,32 @@
 package zoidnet.dev.chat.controller.dto;
 
 import org.springframework.security.core.GrantedAuthority;
-import zoidnet.dev.chat.model.Authority;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class PrincipalDto {
 
     private final String username;
 
-    private final Set<Authority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
 
 
-    public PrincipalDto(String username, Collection<? extends GrantedAuthority> grantedAuthorities) {
+    public PrincipalDto(String username, Collection<? extends GrantedAuthority> authorities) {
         this.username = username;
-        this.authorities = new HashSet<>();
-
-        grantedAuthorities.forEach(grantedAuthority -> {
-            Authority authority = Authority.valueOf(grantedAuthority.getAuthority());
-            this.authorities.add(authority);
-        });
+        this.authorities = authorities;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
+    public Set<String> getAuthorities() {
+        return authorities
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
     }
 }
