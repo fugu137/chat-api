@@ -69,7 +69,7 @@ public class SecurityConfigurationTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
-                .andExpect(content().json("{ 'username': 'Freddie', 'authorities': [{ 'authority': 'ROLE_USER' }] }"));
+                .andExpect(content().json("{ 'username': 'Freddie', 'authorities': ['ROLE_USER'] }"));
     }
 
     @Test

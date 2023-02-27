@@ -57,7 +57,7 @@ public class UserControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{ 'username': 'Jacqueline', 'authorities': [{ 'authority': 'ROLE_ADMIN' }]}"));
+                .andExpect(content().json("{ 'username': 'Jacqueline', 'authorities': ['ROLE_ADMIN']}"));
     }
 
     @Test

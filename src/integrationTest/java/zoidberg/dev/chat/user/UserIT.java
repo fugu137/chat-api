@@ -39,7 +39,7 @@ public class UserIT {
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{ 'username': 'User 1', 'authorities': [{ 'authority': 'ROLE_USER' }] }"));
+                .andExpect(content().json("{ 'username': 'User 1', 'authorities': ['ROLE_USER'] }"));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class UserIT {
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{ 'username': 'Admin', 'authorities': [{ 'authority': 'ROLE_ADMIN' }] }"));
+                .andExpect(content().json("{ 'username': 'Admin', 'authorities': ['ROLE_ADMIN'] }"));
     }
 
     @Test

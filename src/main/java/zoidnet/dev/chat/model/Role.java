@@ -1,10 +1,13 @@
 package zoidnet.dev.chat.model;
 
+import static zoidnet.dev.chat.model.Authority.ROLE_ADMIN;
+import static zoidnet.dev.chat.model.Authority.ROLE_USER;
+
 public enum Role {
 
-    USER ("ROLE_USER"),
+    USER (ROLE_USER.name()),
 
-    ADMIN ("ROLE_ADMIN");
+    ADMIN (ROLE_ADMIN.name());
 
     private final String authority;
 
