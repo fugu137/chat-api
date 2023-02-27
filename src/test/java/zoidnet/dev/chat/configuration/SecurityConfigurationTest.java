@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -14,24 +16,29 @@ import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ActiveProfiles("test")
-@WebMvcTest(SecurityConfiguration.class)
-public class AuthenticationTest {
+@WebMvcTest(value = SecurityConfiguration.class)
+public class SecurityConfigurationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @MockBean
     private UserRepository userRepository;
@@ -63,6 +70,32 @@ public class AuthenticationTest {
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
                 .andExpect(content().json("{ 'username': 'Freddie', 'authorities': [{ 'authority': 'ROLE_USER' }] }"));
+    }
+
+    @Test
+    void shouldCheckRepositoryForUserDetailsOnLogin() throws Exception {
+        String username = "username";
+        String password = "password";
+
+        mockMvc.perform(formLogin("/login")
+                .user(username)
+                .password(password)
+        );
+
+        verify(userRepository, times(1)).findByUsername(username);
+    }
+
+    @Test
+    void shouldThrowUsernameNotFoundExceptionFromUserDetailsServiceAfterLoginWithIncorrectUsername() throws Exception {
+        String wrongUsername = "wrongUsername";
+        String password = "password";
+
+        mockMvc.perform(formLogin("/login")
+                .user(wrongUsername)
+                .password(password)
+        );
+
+        assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(wrongUsername));
     }
 
     @Test
@@ -132,5 +165,22 @@ public class AuthenticationTest {
     void shouldReturn200AfterSuccessfulLogout() throws Exception {
         mockMvc.perform(logout())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldAllowRequestsFromCorsAllowedOrigins() throws Exception {
+        mockMvc.perform(options("/login")
+                        .header("Access-Control-Request-Method", "GET")
+                        .header("Origin", "http://allowed-url.com"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldNotAllowRequestsFromNonCorsAllowedOrigins() throws Exception {
+        mockMvc.perform(options("/login")
+                        .header("Access-Control-Request-Method", "GET")
+                        .header("Origin", "http://non-allowed-url.com"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("Invalid CORS request"));
     }
 }
