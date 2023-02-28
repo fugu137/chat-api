@@ -1,4 +1,4 @@
-package zoidnet.dev.chat.controller.dto;
+package zoidnet.dev.chat.model.dto;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -29,4 +29,5 @@ public class PrincipalDto {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
     }
+
 }

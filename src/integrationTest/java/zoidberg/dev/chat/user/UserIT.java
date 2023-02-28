@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.Application;
-import zoidnet.dev.chat.controller.dto.UserDto;
+import zoidnet.dev.chat.model.dto.UserDto;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -25,7 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Transactional
-@Sql({"classpath:user-reset.sql", "classpath:user-data.sql"})
+//@Sql({"classpath:user-reset.sql", "classpath:user-data.sql"})
+@Sql("classpath:user-data.sql")
+@Sql(scripts = "classpath:user-reset.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class UserIT {
 
     @Autowired

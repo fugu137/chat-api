@@ -3,11 +3,13 @@ package zoidnet.dev.chat.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import zoidnet.dev.chat.controller.dto.UserDto;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.Role;
 import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -28,9 +30,12 @@ public class UserService {
 
         if (existingUser.isPresent()) return null;
 
-        User newUser = userDto.toUser(passwordEncoder);
+        Set<Role> roles = Set.of(Role.USER);
+        User newUser = userDto.toUser(passwordEncoder, roles);
 
-        return userRepository.save(newUser);
+        userRepository.insert(newUser);
+
+        return newUser;
     }
 
 }

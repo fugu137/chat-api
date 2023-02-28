@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import zoidnet.dev.chat.controller.dto.PrincipalDto;
-import zoidnet.dev.chat.controller.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.dto.PrincipalDto;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.service.UserService;
 
 

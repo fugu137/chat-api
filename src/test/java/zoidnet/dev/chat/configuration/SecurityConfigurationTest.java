@@ -10,11 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import zoidnet.dev.chat.controller.dto.UserDto;
+import zoidnet.dev.chat.model.Role;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -50,7 +52,7 @@ public class SecurityConfigurationTest {
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder);
+        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -64,7 +66,7 @@ public class SecurityConfigurationTest {
         String password = "chicken";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder);
+        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -117,7 +119,7 @@ public class SecurityConfigurationTest {
         String wrongPassword = "drowssap";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder);
+        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -132,7 +134,7 @@ public class SecurityConfigurationTest {
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder);
+        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -149,7 +151,7 @@ public class SecurityConfigurationTest {
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder);
+        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
