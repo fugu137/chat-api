@@ -2,8 +2,6 @@ package zoidnet.dev.chat.model;
 
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.util.Objects;
 import java.util.Set;
@@ -17,11 +15,10 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 55)
+    @Column(nullable = false, length = 55)
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    @Cascade({CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST})
     private Set<User> users;
 
     public static Role ADMIN = new Role("ADMIN");
@@ -56,7 +53,7 @@ public class Role {
     }
 
     public String toString() {
-        return name;
+        return "{id: " + id + ", name: " + name + "}";
     }
 
     @Override

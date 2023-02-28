@@ -2,11 +2,9 @@ package zoidnet.dev.chat.repository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import zoidnet.dev.chat.model.Role;
@@ -24,9 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-@Sql("classpath:user-data.sql")
-@Sql(scripts = "classpath:user-reset.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql({"classpath:reset.sql", "classpath:data.sql"})
 public class UserRepositoryTest {
 
     @Autowired
@@ -83,7 +79,7 @@ public class UserRepositoryTest {
 
         User newUser = new User(username, password, Set.of(Role.USER));
 
-        assertDoesNotThrow(() -> userRepository.insert(newUser));
+        assertDoesNotThrow(() -> userRepository.save(newUser));
     }
 
     @Test
@@ -93,6 +89,6 @@ public class UserRepositoryTest {
 
         User newUser = new User(username, password, Set.of(Role.USER));
 
-        assertThrows(DataIntegrityViolationException.class, () -> userRepository.insert(newUser));
+        assertThrows(DataIntegrityViolationException.class, () -> userRepository.save(newUser));
     }
 }

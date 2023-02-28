@@ -71,46 +71,46 @@ public class UserControllerTest {
                 .andExpect(content().string(emptyString()));
     }
 
-//    @Test
-//    void shouldCreateUser() throws Exception {
-//        String username = "Jacqueline";
-//        String password = "password";
-//
-//        UserDto userDto = new UserDto(username, password);
-//        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
-//        Set<Role> roles = Set.of(Role.USER);
-//
-//        when(userService.registerUser(userDto)).thenReturn(new User(username, password, roles));
-//
-//        mockMvc.perform(post("/users")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(userAsJson))
-//                .andExpect(status().isCreated());
-//
-//        verify(userService, times(1)).registerUser(userDtoCaptor.capture());
-//
-//        UserDto capturedDto = userDtoCaptor.getValue();
-//        assertThat(capturedDto.getUsername(), is(username));
-//        assertThat(capturedDto.getPassword(), is(password));
-//    }
+    @Test
+    void shouldCreateUser() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
 
-//    @Test
-//    void shouldReturn409IfUsernameAlreadyExists() throws Exception {
-//        String username = "Jacqueline";
-//        String password = "password";
-//
-//        UserDto userDto = new UserDto(username, password);
-//        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
-//
-//        when(userService.registerUser(userDto)).thenReturn(null);
-//
-//        mockMvc.perform(post("/users")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(userAsJson))
-//                .andExpect(status().isConflict());
-//    }
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+        Set<Role> roles = Set.of(Role.USER);
+
+        when(userService.registerUser(userDto)).thenReturn(new User(username, password, roles));
+
+        mockMvc.perform(post("/users")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isCreated());
+
+        verify(userService, times(1)).registerUser(userDtoCaptor.capture());
+
+        UserDto capturedDto = userDtoCaptor.getValue();
+        assertThat(capturedDto.getUsername(), is(username));
+        assertThat(capturedDto.getPassword(), is(password));
+    }
+
+    @Test
+    void shouldReturn409IfUsernameAlreadyExists() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+
+        when(userService.registerUser(userDto)).thenReturn(null);
+
+        mockMvc.perform(post("/users")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isConflict());
+    }
 
     @Test
     void shouldReturn403IfCsrfTokenIsMissing() throws Exception {
@@ -143,21 +143,21 @@ public class UserControllerTest {
                 .andExpect(content().string("Invalid CSRF Token 'AQEBYGNi' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'."));
     }
 
-//    @Test
-//    void shouldReturn500IfServiceThrowsError() throws Exception {
-//        String username = "Jacqueline";
-//        String password = "password";
-//
-//        UserDto userDto = new UserDto(username, password);
-//        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
-//
-//        doThrow(new DataIntegrityViolationException("Invalid data")).when(userService).registerUser(userDto);
-//
-//        mockMvc.perform(post("/users")
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(userAsJson))
-//                .andExpect(status().isInternalServerError());
-//    }
+    @Test
+    void shouldReturn500IfServiceThrowsError() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+
+        doThrow(new DataIntegrityViolationException("Invalid data")).when(userService).registerUser(userDto);
+
+        mockMvc.perform(post("/users")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isInternalServerError());
+    }
 
 }

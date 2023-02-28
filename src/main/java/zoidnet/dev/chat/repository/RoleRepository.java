@@ -2,14 +2,14 @@ package zoidnet.dev.chat.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.Role;
 
 import java.util.Optional;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    Optional<User> findByUsername(String username);
+    Optional<Role> findByName(String name);
 
 }

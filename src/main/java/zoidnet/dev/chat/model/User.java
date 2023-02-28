@@ -76,13 +76,13 @@ public class User {
         return roles;
     }
 
-    public void setRole(Set<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
     @Override
     public String toString() {
-        return String.format("id: %d, username: %s, password: %s, role: %s", this.id, this.username, this.password, this.roles);
+        return String.format("id: %d, username: %s, password: %s, roles: %s", this.id, this.username, this.password, this.roles);
     }
 
     @Override
@@ -90,14 +90,11 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id.equals(user.id) &&
-                username.equals(user.username) &&
-                password.equals(user.password) &&
-                roles.toString().equals(user.roles.toString());
+        return id.equals(user.id) && username.equals(user.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, password);
+        return Objects.hash(id, username);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import zoidnet.dev.chat.model.Role;
 import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.repository.RoleRepository;
 import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.Optional;
@@ -34,6 +35,9 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
@@ -52,10 +56,11 @@ public class UserServiceTest {
         UserDto userDto = new UserDto(username, password);
 
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(Role.USER));
 
         userService.registerUser(userDto);
 
-        verify(userRepository, times(1)).insert(userArgumentCaptor.capture());
+        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
         User capturedArgument = userArgumentCaptor.getValue();
 
         assertThat(capturedArgument.getUsername(), is(username));
@@ -71,10 +76,11 @@ public class UserServiceTest {
         UserDto userDto = new UserDto(username, password);
 
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(Role.USER));
 
         userService.registerUser(userDto);
 
-        verify(userRepository, times(1)).insert(userArgumentCaptor.capture());
+        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
         User capturedArgument = userArgumentCaptor.getValue();
 
         assertThat(capturedArgument.getRoles(), contains(equalToObject(Role.USER)));

@@ -2,7 +2,6 @@ package zoidberg.dev.chat.user;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,13 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@ActiveProfiles("integration")
+@ActiveProfiles("test")
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
-@Transactional
-//@Sql({"classpath:user-reset.sql", "classpath:user-data.sql"})
-@Sql("classpath:user-data.sql")
-@Sql(scripts = "classpath:user-reset.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql({"classpath:reset.sql", "classpath:data.sql"})
 public class UserIT {
 
     @Autowired
