@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,12 +25,13 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import zoidnet.dev.chat.controller.dto.PrincipalDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.dto.PrincipalDto;
 import zoidnet.dev.chat.repository.UserRepository;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -50,8 +52,10 @@ public class SecurityConfiguration {
         return (String username) -> {
             User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().asAuthority());
-            Set<SimpleGrantedAuthority> authorities = Set.of(authority);
+            Set<SimpleGrantedAuthority> authorities = user.getRoles()
+                    .stream()
+                    .map(role -> new SimpleGrantedAuthority(role.toAuthority()))
+                    .collect(Collectors.toSet());
 
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
         };
@@ -118,6 +122,8 @@ public class SecurityConfiguration {
         return (request, response, authentication) -> {
             PrincipalDto principalDto = new PrincipalDto(authentication.getName(), authentication.getAuthorities());
             String content = new ObjectMapper().writeValueAsString(principalDto);
+
+            response.setHeader("Content-Type", MediaType.APPLICATION_JSON.toString());
             response.getWriter().write(content);
         };
     }

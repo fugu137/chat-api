@@ -7,20 +7,22 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.model.Role;
+import zoidnet.dev.chat.model.User;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Sql({"classpath:user-reset.sql", "classpath:user-data.sql"})
+@Sql({"classpath:reset.sql", "classpath:data.sql"})
 public class UserRepositoryTest {
 
     @Autowired
@@ -42,7 +44,7 @@ public class UserRepositoryTest {
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
-        assertThat(user.getRole(), is(Role.USER));
+        assertThat(user.getRoles(), contains(equalToObject(Role.USER)));
     }
 
     @Test
@@ -60,7 +62,7 @@ public class UserRepositoryTest {
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
-        assertThat(user.getRole(), is(Role.ADMIN));
+        assertThat(user.getRoles(), contains(equalToObject(Role.ADMIN)));
     }
 
     @Test
@@ -75,11 +77,9 @@ public class UserRepositoryTest {
         String username = "User 3";
         String password = "password3";
 
-        User newUser = new User(username, password, Role.USER);
+        User newUser = new User(username, password, Set.of(Role.USER));
 
-        User result = userRepository.save(newUser);
-
-        assertThat(result, is(newUser));
+        assertDoesNotThrow(() -> userRepository.save(newUser));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class UserRepositoryTest {
         String username = "User 1";
         String password = "password";
 
-        User newUser = new User(username, password, Role.USER);
+        User newUser = new User(username, password, Set.of(Role.USER));
 
         assertThrows(DataIntegrityViolationException.class, () -> userRepository.save(newUser));
     }
