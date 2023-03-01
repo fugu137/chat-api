@@ -17,8 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.model.Role;
-import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.service.UserService;
 
 import java.util.Set;
@@ -75,10 +75,10 @@ public class UserControllerTest {
     void shouldCreateUser() throws Exception {
         String username = "Jacqueline";
         String password = "password";
+        Set<Role> roles = new Role(1L, "USER").asSingletonSet();
 
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
-        Set<Role> roles = Set.of(Role.USER);
 
         when(userService.registerUser(userDto)).thenReturn(new User(username, password, roles));
 

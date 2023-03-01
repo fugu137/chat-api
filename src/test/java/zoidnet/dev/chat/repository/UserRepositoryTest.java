@@ -40,11 +40,12 @@ public class UserRepositoryTest {
         assertThat(result.isPresent(), is(true));
 
         User user = result.get();
-
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
-        assertThat(user.getRoles(), contains(equalToObject(Role.USER)));
+
+        assertThat(user.getRoles(), hasSize(1));
+        assertThat(user.getRoles(), contains(equalToObject(new Role(2L, "USER"))));
     }
 
     @Test
@@ -58,11 +59,15 @@ public class UserRepositoryTest {
         assertThat(result.isPresent(), is(true));
 
         User user = result.get();
-
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
-        assertThat(user.getRoles(), contains(equalToObject(Role.ADMIN)));
+
+        assertThat(user.getRoles(), hasSize(2));
+        assertThat(user.getRoles(), contains(
+                equalToObject(new Role(1L, "ADMIN")),
+                equalToObject(new Role(2L, "USER"))
+        ));
     }
 
     @Test
@@ -76,8 +81,9 @@ public class UserRepositoryTest {
     void shouldSaveNewUser() {
         String username = "User 3";
         String password = "password3";
+        Set<Role> roles = Role.USER.asSingletonSet();
 
-        User newUser = new User(username, password, Set.of(Role.USER));
+        User newUser = new User(username, password, roles);
 
         assertDoesNotThrow(() -> userRepository.save(newUser));
     }
@@ -86,8 +92,9 @@ public class UserRepositoryTest {
     void shouldNotSaveNewUserIfUsernameAlreadyExists() {
         String username = "User 1";
         String password = "password";
+        Set<Role> roles = Role.USER.asSingletonSet();
 
-        User newUser = new User(username, password, Set.of(Role.USER));
+        User newUser = new User(username, password, roles);
 
         assertThrows(DataIntegrityViolationException.class, () -> userRepository.save(newUser));
     }

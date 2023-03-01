@@ -11,10 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.model.Role;
-import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.repository.UserRepository;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,9 +52,10 @@ public class SecurityConfigurationTest {
     void shouldReturn200AfterLoginWithValidDetails() throws Exception {
         String username = "username";
         String password = "password";
+        Set<Role> roles = new Role(5L, "USER").asSingletonSet();
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
+        User user = userDto.toUser(passwordEncoder, roles);
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -66,12 +69,31 @@ public class SecurityConfigurationTest {
         String password = "chicken";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
+        User user = userDto.toUser(passwordEncoder, Role.USER.asSingletonSet());
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         mockMvc.perform(formLogin("/login").user(username).password(password))
                 .andExpect(content().json("{ 'username': 'Freddie', 'authorities': ['ROLE_USER'] }"));
+    }
+
+    @Test
+    void shouldReturnLoggedInUserWithMultipleRolesAfterLoginWithValidDetails() throws Exception {
+        String username = "userAdmin";
+        String password = "password123";
+
+        Role editor = new Role(1L, "EDITOR");
+        Role advisor = new Role(2L, "ADVISOR");
+
+        Set<Role> roles = new HashSet<>(List.of(editor, advisor));
+
+        UserDto userDto = new UserDto(username, password);
+        User user = userDto.toUser(passwordEncoder, roles);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        mockMvc.perform(formLogin("/login").user(username).password(password))
+                .andExpect(content().json("{ 'username': 'userAdmin', 'authorities': ['ROLE_EDITOR', 'ROLE_ADVISOR'] }"));
     }
 
     @Test
@@ -119,7 +141,7 @@ public class SecurityConfigurationTest {
         String wrongPassword = "drowssap";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
+        User user = userDto.toUser(passwordEncoder, Role.USER.asSingletonSet());
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -134,7 +156,7 @@ public class SecurityConfigurationTest {
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
+        User user = userDto.toUser(passwordEncoder, Role.USER.asSingletonSet());
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -151,7 +173,7 @@ public class SecurityConfigurationTest {
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
-        User user = userDto.toUser(passwordEncoder, Set.of(Role.USER));
+        User user = userDto.toUser(passwordEncoder, Role.USER.asSingletonSet());
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 

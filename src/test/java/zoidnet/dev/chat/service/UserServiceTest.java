@@ -11,8 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import zoidnet.dev.chat.model.Role;
-import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.repository.RoleRepository;
 import zoidnet.dev.chat.repository.UserRepository;
 
@@ -21,9 +21,9 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalToObject;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
 
@@ -56,7 +56,7 @@ public class UserServiceTest {
         UserDto userDto = new UserDto(username, password);
 
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(Role.USER));
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(new Role(1L, "USER")));
 
         userService.registerUser(userDto);
 
@@ -76,14 +76,15 @@ public class UserServiceTest {
         UserDto userDto = new UserDto(username, password);
 
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(Role.USER));
+        when(roleRepository.findByName("USER")).thenReturn(Optional.empty());
 
         userService.registerUser(userDto);
 
         verify(userRepository, times(1)).save(userArgumentCaptor.capture());
-        User capturedArgument = userArgumentCaptor.getValue();
 
-        assertThat(capturedArgument.getRoles(), contains(equalToObject(Role.USER)));
+        Set<Role> roles = userArgumentCaptor.getValue().getRoles();
+        assertThat(roles, hasSize(1));
+        assertThat(roles, contains(equalToObject(Role.USER)));
     }
 
     @Test
@@ -93,9 +94,9 @@ public class UserServiceTest {
         String encodedPassword = "encodedPassword";
 
         UserDto userDto = new UserDto(username, password);
-        User userToReturn = new User(username, encodedPassword, Set.of(Role.USER));
+        User userFromRepository = new User(username, encodedPassword, Role.USER.asSingletonSet());
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userToReturn));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userFromRepository));
 
         User savedUser = userService.registerUser(userDto);
 

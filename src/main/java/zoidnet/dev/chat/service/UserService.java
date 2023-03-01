@@ -9,8 +9,7 @@ import zoidnet.dev.chat.model.Role;
 import zoidnet.dev.chat.repository.RoleRepository;
 import zoidnet.dev.chat.repository.UserRepository;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -34,14 +33,12 @@ public class UserService {
 
         if (existingUser.isPresent()) return null;
 
-        Role userRole = roleRepository.findByName("USER").orElseGet(() -> roleRepository.save(Role.USER));
-        Set<Role> roles = Set.of(userRole);
+        Role userRole = roleRepository.findByName(Role.USER.getName()).orElseGet(() -> Role.USER);
+        Set<Role> roles = userRole.asSingletonSet();
 
         User newUser = userDto.toUser(passwordEncoder, roles);
 
-        userRepository.save(newUser);
-
-        return newUser;
+        return userRepository.save(newUser);
     }
 
 }
