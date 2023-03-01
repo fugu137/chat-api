@@ -37,12 +37,15 @@ public class UserController {
     public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
         try {
             User registeredUser = userService.registerUser(userDto);
-            if (registeredUser != null) return ResponseEntity.status(HttpStatus.CREATED).build();
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            if (registeredUser == null) return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
 
         } catch (Exception e) {
-            if (e instanceof IllegalArgumentException) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            if (e instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

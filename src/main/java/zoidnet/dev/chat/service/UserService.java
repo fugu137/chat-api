@@ -29,7 +29,7 @@ public class UserService {
     }
 
     public User registerUser(UserDto userDto) {
-        Optional<User> existingUser = userRepository.findByUsername(userDto.username());
+        Optional<User> existingUser = userRepository.findByUsername(userDto.getUsername());
 
         if (existingUser.isPresent()) return null;
 

@@ -17,11 +17,9 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 55)
+    @Column(nullable = false, unique = true, length = 55)
     private String name;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
 
     public static Role ADMIN = new Role("ADMIN");
 

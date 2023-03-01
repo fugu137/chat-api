@@ -144,14 +144,31 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturn500IfServiceThrowsError() throws Exception {
+    void shouldReturn400IfServiceThrowsIllegalArgumentException() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        doThrow(new DataIntegrityViolationException("Invalid data")).when(userService).registerUser(userDto);
+        doThrow(new IllegalArgumentException("Argument not valid")).when(userService).registerUser(userDto);
+
+        mockMvc.perform(post("/users")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn500IfServiceThrowsOtherException() throws Exception {
+        String username = "Jacqueline";
+        String password = "password";
+
+        UserDto userDto = new UserDto(username, password);
+        String userAsJson = new ObjectMapper().writeValueAsString(userDto);
+
+        doThrow(new DataIntegrityViolationException("Database table key already exists")).when(userService).registerUser(userDto);
 
         mockMvc.perform(post("/users")
                         .with(csrf())

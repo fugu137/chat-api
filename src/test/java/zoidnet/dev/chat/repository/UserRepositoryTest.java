@@ -16,7 +16,6 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -44,9 +43,6 @@ public class UserRepositoryTest {
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
-
-        assertThat(user.getRoles(), hasSize(1));
-        assertThat(user.getRoles(), contains(equalToObject(new Role(2L, "USER"))));
     }
 
     @Test
@@ -63,9 +59,18 @@ public class UserRepositoryTest {
         assertThat(user.getId(), is(id));
         assertThat(user.getUsername(), is(username));
         assertThat(user.getPassword(), is(password));
+    }
 
-        assertThat(user.getRoles(), hasSize(2));
-        assertThat(user.getRoles(), contains(
+    @Test
+    void shouldFindUserWithRoles() {
+        Optional<User> result = userRepository.findByUsername("Admin");
+
+        assertThat(result.isPresent(), is(true));
+
+        Set<Role> roles = result.get().getRoles();
+
+        assertThat(roles, hasSize(2));
+        assertThat(roles, contains(
                 equalToObject(new Role(1L, "ADMIN")),
                 equalToObject(new Role(2L, "USER"))
         ));
@@ -82,11 +87,13 @@ public class UserRepositoryTest {
     void shouldSaveNewUser() {
         String username = "User 3";
         String password = "password3";
-        Set<Role> roles = Role.USER.asSingletonSet();
+        Set<Role> roles = new Role("ADVISOR").asSingletonSet();
 
         User newUser = new User(username, password, roles);
 
-        assertDoesNotThrow(() -> userRepository.save(newUser));
+        User savedUser = userRepository.save(newUser);
+
+        assertThat(savedUser, is(newUser));
     }
 
     @Test
