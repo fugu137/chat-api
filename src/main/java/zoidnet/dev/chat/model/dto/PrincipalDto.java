@@ -1,5 +1,6 @@
 package zoidnet.dev.chat.model.dto;
 
+
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;

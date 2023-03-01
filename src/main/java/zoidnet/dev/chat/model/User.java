@@ -1,5 +1,6 @@
 package zoidnet.dev.chat.model;
 
+
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
