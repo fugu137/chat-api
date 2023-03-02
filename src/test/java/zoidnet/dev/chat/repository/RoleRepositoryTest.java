@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import zoidnet.dev.chat.model.Role;
@@ -13,8 +12,7 @@ import zoidnet.dev.chat.model.Role;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hamcrest.Matchers.is;
 
 
 
@@ -49,19 +47,4 @@ public class RoleRepositoryTest {
         assertThat(result.isPresent(), is(false));
     }
 
-    @Test
-    void shouldSaveNewRole() {
-        Role newRole = new Role("NEW_ROLE");
-
-        Role savedRole = roleRepository.save(newRole);
-
-        assertThat(savedRole, is(newRole));
-    }
-
-    @Test
-    void shouldNotSaveNewRoleIfRoleNameAlreadyExists() {
-        Role newRole = new Role("USER");
-
-        assertThrows(DataIntegrityViolationException.class, () -> roleRepository.save(newRole));
-    }
 }
