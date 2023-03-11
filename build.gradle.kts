@@ -3,6 +3,7 @@ plugins {
     idea
     id("org.springframework.boot") version "3.0.2"
     id("io.spring.dependency-management") version "1.1.0"
+    id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
 }
 
 group = "zoidnet.dev"
@@ -29,6 +30,10 @@ idea {
     }
 }
 
+openApi {
+    outputDir.set(file("docs"))
+}
+
 configurations["integrationTestImplementation"].extendsFrom(configurations.testImplementation.get())
 configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
@@ -37,6 +42,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3")
+    implementation("org.hibernate:hibernate-validator:8.0.0.Final")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -79,6 +86,25 @@ tasks.register<GradleBuild>("dockerRun") {
             commandLine("docker", "compose", "up", "--build")
         }
     }
+}
+
+tasks.register("cleanApiDocs") {
+    description = "Removes the Swagger API docs from the 'docs' director."
+    group = "documentation"
+
+    doLast {
+        exec {
+            commandLine("rm", "-f", "docs/openapi.json")
+        }
+    }
+}
+
+tasks.register<GradleBuild>("generateApiDocs") {
+    description = "Generates Swagger API docs into the 'docs' directory."
+    group = "documentation"
+
+    tasks = listOf("cleanApiDocs", "generateOpenApiDocs")
+    mustRunAfter("cleanApiDocs")
 }
 
 tasks.register<Test>("integrationTest") {

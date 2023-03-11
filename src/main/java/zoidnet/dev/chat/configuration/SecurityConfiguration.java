@@ -93,6 +93,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorise -> authorise
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

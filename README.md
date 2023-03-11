@@ -147,3 +147,11 @@ Finally, if you want to run all of the tests, run:
 ```zsh
 ./gradlew check
 ```
+
+### 4. Generating the API docs
+
+The project is configured to generate Swagger API documentation with the following command:
+
+```zsh
+./gradlew clean generateApiDocs
+```
