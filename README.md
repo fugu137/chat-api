@@ -1,11 +1,12 @@
 # Chat Service 
 
-![CI/CD Pipeline](https://github.com/fugu137/chat-api/actions/workflows/pipeline.yml/badge.svg) ![status: in progress](https://badgen.net/badge/status/in%20progress/orange) ![release](https://badgen.net/github/release/fugu137/chat-api)
+![CI/CD Pipeline](https://github.com/fugu137/chat-api/actions/workflows/pipeline.yml/badge.svg) 
+![status: in progress](https://badgen.net/badge/status/in%20progress/orange) 
+![release](https://badgen.net/github/release/fugu137/chat-api)
 
-The chat service consists of a Spring application and a database. If you don't want to do any local development and
+The chat service consists of a Spring application (API) and a database. If you don't want to do any local development and
 just want to run the application see [Running the Application in Docker](#running-the-application-in-docker) below. If
-you
-want to do local development, run tests, or have more control over how you run the application,
+you want to do local development, run tests, or have more control over how you run the application,
 see [Local Development](#local-development).
 
 ## Running the Application in Docker
@@ -36,6 +37,11 @@ added to your .env file.)
 *_Note: if all you want to do is run the application in Docker there is no need to clone this repository. You can just
 download or copy the `docker-compose.yml` file and follow the instructions above. Docker compose will pull an image from
 [DockerHub](https://hub.docker.com/repository/docker/fugu137/chat-service) and use that to run the chat service, rather than building the image from the codebase._
+
+## API Documentation
+
+When the service is running full Swagger API documentation is published at `/swagger-ui.html`. The OpenAPI specification
+used to generate the documentation is available at `/v3/api-docs`.
 
 ## Local Development
 
@@ -146,12 +152,4 @@ Finally, if you want to run all of the tests, run:
 
 ```zsh
 ./gradlew check
-```
-
-### 4. Generating the API docs
-
-The project is configured to generate Swagger API documentation with the following command:
-
-```zsh
-./gradlew clean generateApiDocs
 ```

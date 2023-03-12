@@ -91,16 +91,21 @@ public class SecurityConfiguration {
                         .accessDeniedHandler(accessDeniedHandler())
                 )
                 .authorizeHttpRequests(authorise -> authorise
-                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/logout").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
+                        .loginProcessingUrl("/users/login")
                         .successHandler(authenticationSuccessHandler())
                         .failureHandler(authenticationFailureHandler())
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/users/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 );
 

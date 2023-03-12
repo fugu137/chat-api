@@ -35,7 +35,7 @@ public class UserIT {
         String username = "User 1";
         String password = "password1";
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{ 'username': 'User 1', 'authorities': ['ROLE_USER'] }"));
     }
@@ -45,7 +45,7 @@ public class UserIT {
         String username = "Admin";
         String password = "adminPassword";
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{ 'username': 'Admin', 'authorities': ['ROLE_USER', 'ROLE_ADMIN'] }"));
     }
@@ -55,7 +55,7 @@ public class UserIT {
         String username = "Non-existent User";
         String password = "password";
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -64,7 +64,7 @@ public class UserIT {
         String username = "User 1";
         String password = "wrongPassword";
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(status().isUnauthorized());
     }
 

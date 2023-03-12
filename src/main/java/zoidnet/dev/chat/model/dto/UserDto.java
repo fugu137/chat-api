@@ -2,8 +2,8 @@ package zoidnet.dev.chat.model.dto;
 
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.model.Role;
+import zoidnet.dev.chat.model.User;
 
 import java.util.Set;
 
@@ -21,4 +21,5 @@ public record UserDto(String username, String password) {
     public User toUser(PasswordEncoder passwordEncoder, Set<Role> roles) {
         return new User(username, passwordEncoder.encode(password), roles);
     }
+
 }

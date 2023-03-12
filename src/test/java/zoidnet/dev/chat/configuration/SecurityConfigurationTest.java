@@ -59,7 +59,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(status().isOk());
     }
 
@@ -73,7 +73,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(content().json("{ 'username': 'Freddie', 'authorities': ['ROLE_USER'] }"));
     }
 
@@ -92,7 +92,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        mockMvc.perform(formLogin("/login").user(username).password(password))
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
                 .andExpect(content().json("{ 'username': 'userAdmin', 'authorities': ['ROLE_EDITOR', 'ROLE_ADVISOR'] }"));
     }
 
@@ -101,7 +101,7 @@ public class SecurityConfigurationTest {
         String username = "username";
         String password = "password";
 
-        mockMvc.perform(formLogin("/login")
+        mockMvc.perform(formLogin("/users/login")
                 .user(username)
                 .password(password)
         );
@@ -114,7 +114,7 @@ public class SecurityConfigurationTest {
         String wrongUsername = "wrongUsername";
         String password = "password";
 
-        mockMvc.perform(formLogin("/login")
+        mockMvc.perform(formLogin("/users/login")
                 .user(wrongUsername)
                 .password(password)
         );
@@ -129,7 +129,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(wrongUsername)).thenReturn(Optional.empty());
 
-        mockMvc.perform(formLogin("/login").user(wrongUsername).password(password))
+        mockMvc.perform(formLogin("/users/login").user(wrongUsername).password(password))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Bad credentials"));
     }
@@ -145,7 +145,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        mockMvc.perform(formLogin("/login").user(username).password(wrongPassword))
+        mockMvc.perform(formLogin("/users/login").user(username).password(wrongPassword))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Bad credentials"));
     }
@@ -160,7 +160,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/users/login")
                         .param("username", username)
                         .param("password", password))
                 .andExpect(status().isForbidden())
@@ -177,7 +177,7 @@ public class SecurityConfigurationTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/users/login")
                         .param("username", username)
                         .param("password", password)
                         .with(csrf().useInvalidToken()))
@@ -187,13 +187,13 @@ public class SecurityConfigurationTest {
 
     @Test
     void shouldReturn200AfterSuccessfulLogout() throws Exception {
-        mockMvc.perform(logout())
+        mockMvc.perform(logout().logoutUrl("/users/logout"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldAllowRequestsFromCorsAllowedOrigins() throws Exception {
-        mockMvc.perform(options("/login")
+        mockMvc.perform(options("/users/login")
                         .header("Access-Control-Request-Method", "GET")
                         .header("Origin", "http://allowed-url.com"))
                 .andExpect(status().isOk());
@@ -201,7 +201,7 @@ public class SecurityConfigurationTest {
 
     @Test
     void shouldNotAllowRequestsFromNonCorsAllowedOrigins() throws Exception {
-        mockMvc.perform(options("/login")
+        mockMvc.perform(options("/users/login")
                         .header("Access-Control-Request-Method", "GET")
                         .header("Origin", "http://non-allowed-url.com"))
                 .andExpect(status().isForbidden())

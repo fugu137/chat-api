@@ -3,7 +3,6 @@ plugins {
     idea
     id("org.springframework.boot") version "3.0.2"
     id("io.spring.dependency-management") version "1.1.0"
-    id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
 }
 
 group = "zoidnet.dev"
@@ -28,10 +27,6 @@ idea {
     module {
         testSources.from(sourceSets["integrationTest"].java.srcDirs)
     }
-}
-
-openApi {
-    outputDir.set(file("docs"))
 }
 
 configurations["integrationTestImplementation"].extendsFrom(configurations.testImplementation.get())
@@ -86,25 +81,6 @@ tasks.register<GradleBuild>("dockerRun") {
             commandLine("docker", "compose", "up", "--build")
         }
     }
-}
-
-tasks.register("cleanApiDocs") {
-    description = "Removes the Swagger API docs from the 'docs' director."
-    group = "documentation"
-
-    doLast {
-        exec {
-            commandLine("rm", "-f", "docs/openapi.json")
-        }
-    }
-}
-
-tasks.register<GradleBuild>("generateApiDocs") {
-    description = "Generates Swagger API docs into the 'docs' directory."
-    group = "documentation"
-
-    tasks = listOf("cleanApiDocs", "generateOpenApiDocs")
-    mustRunAfter("cleanApiDocs")
 }
 
 tasks.register<Test>("integrationTest") {
