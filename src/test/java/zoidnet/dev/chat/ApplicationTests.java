@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.UserController;
+import zoidnet.dev.chat.repository.RoleRepository;
 import zoidnet.dev.chat.repository.UserRepository;
 import zoidnet.dev.chat.service.UserService;
 
@@ -29,6 +30,9 @@ class ApplicationTests {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private RoleRepository roleRepository;
+
 
 	@Test
 	void contextShouldLoad() {
@@ -36,5 +40,6 @@ class ApplicationTests {
 		assertThat(userController).isNotNull();
 		assertThat(userService).isNotNull();
 		assertThat(userRepository).isNotNull();
+		assertThat(roleRepository).isNotNull();
 	}
 }

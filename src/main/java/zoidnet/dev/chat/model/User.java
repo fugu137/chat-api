@@ -4,6 +4,7 @@ package zoidnet.dev.chat.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Objects;
 import java.util.Set;
@@ -79,6 +80,10 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Set<SimpleGrantedAuthority> getAuthorities() {
+        return Role.toAuthorities(roles);
     }
 
     @Override

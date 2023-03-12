@@ -8,6 +8,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import zoidnet.dev.chat.model.Role;
@@ -23,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
@@ -60,7 +64,7 @@ public class UserServiceTest {
 
         userService.registerUser(userDto);
 
-        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+        verify(userRepository).save(userArgumentCaptor.capture());
         User capturedArgument = userArgumentCaptor.getValue();
 
         assertThat(capturedArgument.getUsername(), is(username));
@@ -80,7 +84,7 @@ public class UserServiceTest {
 
         userService.registerUser(userDto);
 
-        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+        verify(userRepository).save(userArgumentCaptor.capture());
 
         Set<Role> roles = userArgumentCaptor.getValue().getRoles();
         assertThat(roles, hasSize(1));
@@ -103,6 +107,33 @@ public class UserServiceTest {
         verify(userRepository, never()).save(any());
 
         assertNull(savedUser);
+    }
+
+    @Test
+    void shouldGetUserIfUserExists() {
+        String username = "existingUser";
+        String password = "userPassword";
+
+        UserDto userDto = new UserDto(username, password);
+        User userFromRepository = new User(username, password, Role.USER.asSingletonSet());
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userFromRepository));
+
+        UserDetails user = userService.loadUserByUsername(username);
+
+        assertThat(user.getUsername(), is(userDto.getUsername()));
+        assertThat(user.getPassword(), is(userDto.getPassword()));
+        assertThat(user.getAuthorities(), hasSize(1));
+        assertThat(user.getAuthorities(), contains(equalToObject(new SimpleGrantedAuthority(Role.USER.toAuthority()))));
+    }
+
+    @Test
+    void shouldThrowUsernameNotFoundExceptionIfUserDoesNotExist() {
+        String wrongUsername = "wrongUsername";
+
+        when(userRepository.findByUsername(wrongUsername)).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(wrongUsername));
     }
 
 }

@@ -2,11 +2,13 @@ package zoidnet.dev.chat.model;
 
 
 import jakarta.persistence.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -20,10 +22,16 @@ public class Role {
     @Column(nullable = false, unique = true, length = 55)
     private String name;
 
-
     public static Role ADMIN = new Role("ADMIN");
 
     public static Role USER = new Role("USER");
+
+    public static Set<SimpleGrantedAuthority> toAuthorities(Set<Role> roles) {
+        return roles
+                .stream()
+                .map(role -> new SimpleGrantedAuthority(role.toAuthority()))
+                .collect(Collectors.toSet());
+    }
 
 
     protected Role() {}
