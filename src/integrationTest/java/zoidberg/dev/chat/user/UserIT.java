@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,6 +17,7 @@ import zoidnet.dev.chat.model.dto.UserDto;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,6 +67,22 @@ public class UserIT {
         String password = "wrongPassword";
 
         mockMvc.perform(formLogin("/users/login").user(username).password(password))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithUserDetails("User 1")
+    void shouldGetPrincipalIfLoggedIn() throws Exception {
+        mockMvc.perform(get("/users/principal")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{ 'username': 'User 1', 'authorities': ['ROLE_USER'] }"));
+    }
+
+    @Test
+    void shouldNotGetPrincipalIfNotLoggedIn() throws Exception {
+        mockMvc.perform(get("/users/principal")
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
