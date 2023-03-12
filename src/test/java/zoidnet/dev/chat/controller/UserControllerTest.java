@@ -27,9 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
@@ -48,7 +46,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private PasswordEncoder passwordEncoder;
 
     @MockBean
@@ -62,10 +60,12 @@ public class UserControllerTest {
     void shouldCallUserServiceOnLogin() throws Exception {
         String username = "username";
         String password = "password";
+        String encodedPassword = "encodedPassword";
         Set<Role> roles = new Role(5L, "USER").asSingletonSet();
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(formLogin("/users/login").user(username).password(password));
@@ -77,10 +77,12 @@ public class UserControllerTest {
     void shouldReturn200AfterLoginWithValidDetails() throws Exception {
         String username = "username";
         String password = "password";
+        String encodedPassword = "encodedPassword";
         Set<Role> roles = new Role(5L, "USER").asSingletonSet();
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(formLogin("/users/login").user(username).password(password))
@@ -91,10 +93,12 @@ public class UserControllerTest {
     void shouldReturnLoggedInUserAfterLoginWithValidDetails() throws Exception {
         String username = "Freddie";
         String password = "chicken";
+        String encodedPassword = "encodedPassword";
         Set<Role> roles = Role.USER.asSingletonSet();
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(formLogin("/users/login").user(username).password(password))
@@ -105,14 +109,15 @@ public class UserControllerTest {
     void shouldReturnLoggedInUserWithMultipleRolesAfterLoginWithValidDetails() throws Exception {
         String username = "userAdmin";
         String password = "password123";
+        String encodedPassword = "encodedPassword";
 
         Role editor = new Role(1L, "EDITOR");
         Role advisor = new Role(2L, "ADVISOR");
-
         Set<Role> roles = new HashSet<>(List.of(editor, advisor));
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(formLogin("/users/login").user(username).password(password))
@@ -134,12 +139,13 @@ public class UserControllerTest {
     @Test
     void shouldReturn401AfterLoginWithIncorrectPassword() throws Exception {
         String username = "username";
-        String password = "password";
+        String encodedPassword = "encodedPassword";
         String wrongPassword = "drowssap";
         Set<Role> roles = Role.USER.asSingletonSet();
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(wrongPassword, encodedPassword)).thenReturn(false);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(formLogin("/users/login").user(username).password(wrongPassword))
@@ -151,10 +157,12 @@ public class UserControllerTest {
     void shouldReturn403AfterLoginWithMissingCsrfToken() throws Exception {
         String username = "username";
         String password = "password";
+        String encodedPassword = "encodedPassword";
         Set<Role> roles = Role.USER.asSingletonSet();
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(post("/users/login")
@@ -168,10 +176,12 @@ public class UserControllerTest {
     void shouldReturn403AfterLoginWithInvalidCsrfToken() throws Exception {
         String username = "username";
         String password = "password";
+        String encodedPassword = "encodedPassword";
         Set<Role> roles = Role.USER.asSingletonSet();
 
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, passwordEncoder.encode(password), Role.toAuthorities(roles));
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(username, encodedPassword, Role.toAuthorities(roles));
 
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(userService.loadUserByUsername(username)).thenReturn(authenticatedUser);
 
         mockMvc.perform(post("/users/login")
@@ -224,15 +234,11 @@ public class UserControllerTest {
                         .content(userAsJson))
                 .andExpect(status().isCreated());
 
-        verify(userService).registerUser(userDtoCaptor.capture());
-
-        UserDto capturedDto = userDtoCaptor.getValue();
-        assertThat(capturedDto.getUsername(), is(username));
-        assertThat(capturedDto.getPassword(), is(password));
+        verify(userService).registerUser(userDto);
     }
 
     @Test
-    void shouldReturn409IfUsernameAlreadyExists() throws Exception {
+    void shouldReturn409OnCreateUserIfUsernameAlreadyExists() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
@@ -249,7 +255,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturn403IfCsrfTokenIsMissing() throws Exception {
+    void shouldReturn403OnCreateUserIfCsrfTokenIsMissing() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
@@ -261,10 +267,12 @@ public class UserControllerTest {
                         .content(userAsJson))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string("Could not verify the provided CSRF token because no token was found to compare."));
+
+        verify(userService, never()).registerUser(userDto);
     }
 
     @Test
-    void shouldReturn403IfCsrfTokenIsInvalid() throws Exception {
+    void shouldReturn403OnCreateUserIfCsrfTokenIsInvalid() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
@@ -277,10 +285,12 @@ public class UserControllerTest {
                         .content(userAsJson))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string("Invalid CSRF Token 'AQEBYGNi' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'."));
+
+        verify(userService, never()).registerUser(userDto);
     }
 
     @Test
-    void shouldReturn400IfServiceThrowsIllegalArgumentException() throws Exception {
+    void shouldReturn400OnCreateUserIfServiceThrowsIllegalArgumentException() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
@@ -297,7 +307,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturn500IfServiceThrowsOtherException() throws Exception {
+    void shouldReturn500OnCreateUserIfServiceThrowsOtherException() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
