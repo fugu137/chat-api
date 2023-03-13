@@ -29,6 +29,10 @@ idea {
     }
 }
 
+springBoot {
+    buildInfo()
+}
+
 configurations["integrationTestImplementation"].extendsFrom(configurations.testImplementation.get())
 configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
