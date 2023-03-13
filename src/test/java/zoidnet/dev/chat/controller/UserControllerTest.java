@@ -254,7 +254,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturn409AfterCreatingWithUsernameThatAlreadyExists() throws Exception {
+    void shouldReturn409AfterCreatingUserWithUsernameThatAlreadyExists() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 

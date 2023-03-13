@@ -2,22 +2,27 @@ package zoidberg.dev.chat.user;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.Application;
+import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.model.dto.UserDto;
+import zoidnet.dev.chat.repository.UserRepository;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,6 +36,14 @@ public class UserIT {
     @Autowired
     private MockMvc mockMvc;
 
+    @SpyBean
+    private UserRepository userRepository;
+
+
+    @AfterEach
+    void clearSpyInvocations() {
+        clearInvocations(userRepository);
+    }
 
     @Test
     public void shouldLoginWithExistingUser() throws Exception {
@@ -99,6 +112,9 @@ public class UserIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isCreated());
+
+        mockMvc.perform(formLogin("/users/login").user(username).password(password))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -114,6 +130,8 @@ public class UserIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
                 .andExpect(status().isConflict());
+
+        verify(userRepository, never()).save(any(User.class));
     }
 
 }
