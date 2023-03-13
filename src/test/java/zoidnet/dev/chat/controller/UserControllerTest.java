@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -261,7 +262,7 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        when(userService.registerUser(userDto)).thenReturn(null);
+        when(userService.registerUser(userDto)).thenThrow(new DuplicateKeyException("Username already exists"));
 
         mockMvc.perform(post("/users")
                         .with(csrf())

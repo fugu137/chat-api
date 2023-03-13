@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,7 +26,6 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
@@ -92,7 +92,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void shouldNotSaveUserIfUsernameAlreadyExists() {
+    void shouldThrowDuplicateKeyExceptionIfUsernameAlreadyExists() {
         String username = "duplicateUsername";
         String password = "testPassword";
         String encodedPassword = "encodedPassword";
@@ -102,11 +102,9 @@ public class UserServiceTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(userFromRepository));
 
-        User savedUser = userService.registerUser(userDto);
+        assertThrows(DuplicateKeyException.class, () -> userService.registerUser(userDto));
 
         verify(userRepository, never()).save(any());
-
-        assertNull(savedUser);
     }
 
     @Test

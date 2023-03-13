@@ -114,7 +114,8 @@ public class UserIT {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(formLogin("/users/login").user(username).password(password))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json("{ 'username': 'Jacqueline', authorities: ['ROLE_USER'] }"));
     }
 
     @Test

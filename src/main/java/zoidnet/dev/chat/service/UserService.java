@@ -1,18 +1,19 @@
 package zoidnet.dev.chat.service;
 
 
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import zoidnet.dev.chat.model.dto.UserDto;
-import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.model.Role;
+import zoidnet.dev.chat.model.User;
+import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.repository.RoleRepository;
 import zoidnet.dev.chat.repository.UserRepository;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -31,11 +32,10 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(UserDto userDto) {
+    public User registerUser(UserDto userDto) throws DuplicateKeyException {
         Optional<User> existingUser = userRepository.findByUsername(userDto.getUsername());
 
-        // TODO: throw instead?
-        if (existingUser.isPresent()) return null;
+        if (existingUser.isPresent()) throw new DuplicateKeyException("Username already exists");
 
         Role userRole = roleRepository.findByName(Role.USER.getName()).orElseGet(() -> Role.USER);
         Set<Role> roles = userRole.asSingletonSet();
@@ -46,10 +46,10 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+                .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' does not exist"));
     }
 
 }
