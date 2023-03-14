@@ -2,17 +2,15 @@
 
 FROM eclipse-temurin:17-jdk-alpine as BUILD
 
-COPY build.gradle.kts settings.gradle.kts gradlew /app/
+COPY gradlew settings.gradle.kts build.gradle.kts /app/
 
 COPY /gradle/ /app/gradle/
 
-WORKDIR /app/
-
-RUN ./gradlew build --info || true
-
 COPY /src/ /app/src/
 
-RUN ./gradlew bootJar --info
+WORKDIR /app/
+
+RUN --mount=type=cache,target=/root/.gradle/ ./gradlew bootJar --info
 
 
 FROM eclipse-temurin:17.0.6_10-jre as RUN
