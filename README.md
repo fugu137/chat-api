@@ -15,7 +15,7 @@ If you just want to run the chat service without running tests (requires Docker)
 `docker-compose.yml` file by executing the following command from same directory*:
 
 ```zsh
-docker compose up
+docker compose up --build
 ```
 
 You will need to provide a _database name_, _username_, and _password_ by setting environment variables. The easiest way
