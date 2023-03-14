@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +32,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -210,6 +208,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "Jacqueline", roles = "USER")
     void shouldReturn200AfterSuccessfulLogout() throws Exception {
         mockMvc.perform(logout().logoutUrl("/users/logout"))
                 .andExpect(status().isOk());
@@ -262,7 +261,7 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        when(userService.registerUser(userDto)).thenThrow(new DuplicateKeyException("Username already exists"));
+        when(userService.registerUser(userDto)).thenThrow(new DataIntegrityViolationException("Username already exists"));
 
         mockMvc.perform(post("/users")
                         .with(csrf())
@@ -324,14 +323,14 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturn500AfterCreatingUserWhenThereIsAnInternalError() throws Exception {
+    void shouldReturn500AfterCreatingUserWithInternalError() throws Exception {
         String username = "Jacqueline";
         String password = "password";
 
         UserDto userDto = new UserDto(username, password);
         String userAsJson = new ObjectMapper().writeValueAsString(userDto);
 
-        doThrow(new DataIntegrityViolationException("There is a problem with the database")).when(userService).registerUser(userDto);
+        doThrow(new RuntimeException("Runtime exception")).when(userService).registerUser(userDto);
 
         mockMvc.perform(post("/users")
                         .with(csrf())

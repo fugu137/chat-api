@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import zoidnet.dev.chat.configuration.OpenApiConfiguration;
 import zoidnet.dev.chat.configuration.SecurityConfiguration;
 import zoidnet.dev.chat.controller.UserController;
 import zoidnet.dev.chat.repository.RoleRepository;
@@ -22,6 +23,9 @@ class ApplicationTests {
 	private SecurityConfiguration securityConfiguration;
 
 	@Autowired
+	private OpenApiConfiguration openApiConfiguration;
+
+	@Autowired
 	private UserController userController;
 
 	@Autowired
@@ -37,6 +41,7 @@ class ApplicationTests {
 	@Test
 	void contextShouldLoad() {
 		assertThat(securityConfiguration).isNotNull();
+		assertThat(openApiConfiguration).isNotNull();
 		assertThat(userController).isNotNull();
 		assertThat(userService).isNotNull();
 		assertThat(userRepository).isNotNull();

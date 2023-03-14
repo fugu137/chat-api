@@ -14,11 +14,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import zoidnet.dev.chat.Application;
-import zoidnet.dev.chat.model.User;
 import zoidnet.dev.chat.model.dto.UserDto;
 import zoidnet.dev.chat.repository.UserRepository;
 
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.emptyString;
+import static org.mockito.Mockito.clearInvocations;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -130,9 +130,8 @@ public class UserIT {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAsJson))
-                .andExpect(status().isConflict());
-
-        verify(userRepository, never()).save(any(User.class));
+                .andExpect(status().isConflict())
+                .andExpect(content().string(emptyString()));
     }
 
 }

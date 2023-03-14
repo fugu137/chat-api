@@ -2,7 +2,7 @@ package zoidnet.dev.chat.controller;
 
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,12 +51,12 @@ public class UserController implements IUserController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
         } catch (Exception e) {
-            if (e instanceof DuplicateKeyException) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-
             if (e instanceof IllegalArgumentException) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            if (e instanceof DataIntegrityViolationException) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -8,9 +8,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -92,19 +91,15 @@ public class UserServiceTest {
     }
 
     @Test
-    void shouldThrowDuplicateKeyExceptionIfUsernameAlreadyExists() {
+    void shouldThrowDataIntegrityExceptionIfUsernameAlreadyExists() {
         String username = "duplicateUsername";
         String password = "testPassword";
-        String encodedPassword = "encodedPassword";
 
         UserDto userDto = new UserDto(username, password);
-        User userFromRepository = new User(username, encodedPassword, Role.USER.asSingletonSet());
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userFromRepository));
+        when(userRepository.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
 
-        assertThrows(DuplicateKeyException.class, () -> userService.registerUser(userDto));
-
-        verify(userRepository, never()).save(any());
+        assertThrows(DataIntegrityViolationException.class, () -> userService.registerUser(userDto));
     }
 
     @Test
@@ -117,7 +112,7 @@ public class UserServiceTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(userFromRepository));
 
-        UserDetails user = userService.loadUserByUsername(username);
+        User user = userService.loadUserByUsername(username);
 
         assertThat(user.getUsername(), is(userDto.getUsername()));
         assertThat(user.getPassword(), is(userDto.getPassword()));

@@ -77,7 +77,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    void shouldNotFindUserByUsernameIfNoUserExists() {
+    void shouldNotFindUserByUsernameIfUserDoesNotExist() {
         Optional<User> result = userRepository.findByUsername("Non-existent User");
 
         assertThat(result.isPresent(), is(false));
