@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "zoidnet.dev"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0-M1"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
