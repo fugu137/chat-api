@@ -8,6 +8,9 @@ on:
       - '**/README.md'
 
 jobs:
+  echo:
+    runs-on: ubuntu-latest
+    run: echo '${{ vars }}'
   test-and-build:
     name: Test and Build
     runs-on: ubuntu-latest
