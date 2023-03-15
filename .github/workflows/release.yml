@@ -14,7 +14,6 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: test-and-build
-    if: startsWith(github.event.head_commit.message, 'Test')
     permissions: write-all
     steps:
       - name: Checkout
