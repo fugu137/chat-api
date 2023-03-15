@@ -2,6 +2,9 @@ name: CI/CD Pipeline
 
 on:
   workflow_call:
+    secrets:
+      TEST_POSTGRES_PASSWORD:
+        required: true
   push:
     branches: [ "test-branch" ]
     paths-ignore:
