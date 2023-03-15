@@ -1,101 +1,49 @@
 name: CI/CD Pipeline
 
 on:
+  workflow_call:
   push:
     branches: [ "test-branch" ]
     paths-ignore:
       - '**/README.md'
 
 jobs:
-  test:
+  test-and-build:
     name: Test and Build
     runs-on: ubuntu-latest
-    #    services:
-    #      postgres:
-    #        image: postgres:15.2-alpine3.17
-    #        env:
-    #          POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
-    #          POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
-    #          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
-    #        options: >-
-    #          --health-cmd pg_isready
-    #          --health-interval 10s
-    #          --health-timeout 5s
-    #          --health-retries 5
-    #        ports:
-    #          - 5432:5432
-    #    steps:
-    #      - name: Checkout
-    #        uses: actions/checkout@v3
-    #      - name: Set up Java
-    #        uses: actions/setup-java@v3
-    #        with:
-    #          distribution: 'zulu'
-    #          java-version: '17'
-    #      - name: Test and build
-    #        uses: gradle/gradle-build-action@v2
-    #        env:
-    #          TEST_POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
-    #          TEST_POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
-    #          TEST_POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
-    #        with:
-    #          arguments: clean build
-    #      - name: Upload test results
-    #        if: always()
-    #        uses: actions/upload-artifact@v3
-    #        with:
-    #          name: Test Results
-    #          path: build/reports/tests
-    steps:
-      - name: Test and build
-        run: echo "Test and build"
-  tag:
-    name: Tag
-    runs-on: ubuntu-latest
-    needs: test
-    if: startsWith(github.event.head_commit.message, 'Test')
+    services:
+      postgres:
+        image: postgres:15.2-alpine3.17
+        env:
+          POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
+          POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Add Git credentials
-        run: |
-          git config --global user.email "fugu137@gmail.com"
-          git config --global user.name "Michael Duncan"
-      - name: Set vars
-        id: vars
-        run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          VERSION=$(echo $COMMIT_MSG | head -n 1 | cut -d " " -f2)
-          git tag -a $VERSION -m ""
-
-
-#  release:
-#    name: Release
-#    runs-on: ubuntu-latest
-#    needs: test
-#    if: startsWith(github.event.head_commit.message, 'Test')
-#    permissions: write-all
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Set vars
-#        id: vars
-#        run: |
-#          COMMIT_TITLE=$(git log -1 --pretty=%B | head -n 1)
-#          COMMIT_BODY=$(git log -1 --pretty=%B | tail -n +3)
-#          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-#          echo "$COMMIT_BODY" >> $GITHUB_OUTPUT
-#          echo "EOF" >> $GITHUB_OUTPUT
-#          echo "RELEASE_TITLE<<EOF" >> $GITHUB_OUTPUT
-#          echo "$COMMIT_TITLE" >> $GITHUB_OUTPUT
-#          echo "EOF" >> $GITHUB_OUTPUT
-#      - name: Create Github Release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ github.ref }}
-#          release_name: ${{ steps.vars.outputs.RELEASE_TITLE }}
-#          body: ${{ steps.vars.outputs.RELEASE_NOTES }}
-#          draft: false
-#          prerelease: false
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: Test and build
+        uses: gradle/gradle-build-action@v2
+        env:
+          TEST_POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
+          TEST_POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
+          TEST_POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+        with:
+          arguments: clean build
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Results
+          path: build/reports/tests
