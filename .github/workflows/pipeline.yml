@@ -14,20 +14,20 @@ jobs:
   test-and-build:
     name: Test and Build
     runs-on: ubuntu-latest
-    #    services:
-    #      postgres:
-    #        image: postgres:15.2-alpine3.17
-    #        env:
-    #          POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
-    #          POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
-    #          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
-    #        options: >-
-    #          --health-cmd pg_isready
-    #          --health-interval 10s
-    #          --health-timeout 5s
-    #          --health-retries 5
-    #        ports:
-    #          - 5432:5432
+    services:
+      postgres:
+        image: postgres:15.2-alpine3.17
+        env:
+          POSTGRES_DB: ${{ vars.TEST_POSTGRES_DB }}
+          POSTGRES_USER: ${{ vars.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout
         uses: actions/checkout@v3
