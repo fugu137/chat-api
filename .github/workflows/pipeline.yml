@@ -8,9 +8,6 @@ on:
       - '**/README.md'
 
 jobs:
-  echo:
-    runs-on: ubuntu-latest
-    run: echo '${{ vars }}'
   test-and-build:
     name: Test and Build
     runs-on: ubuntu-latest
@@ -31,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Echo
+        run: echo '${{ vars }}'
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
