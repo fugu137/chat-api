@@ -57,10 +57,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Add Git credentials
+        run: |
+          git config --global user.email "fugu137@gmail.com"
+          git config --global user.name "Michael Duncan"
       - name: Set vars
         id: vars
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           VERSION=$(echo $COMMIT_MSG | head -n 1 | cut -d " " -f2)
