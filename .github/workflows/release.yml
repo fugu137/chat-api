@@ -7,7 +7,7 @@ on:
 jobs:
   test-and-build:
     name: Test and Build
-    uses: fugu137/chat-api/.github/workflows/pipeline.yml
+    uses: ./.github/workflows/pipeline.yml
   release:
     name: Release
     runs-on: ubuntu-latest
