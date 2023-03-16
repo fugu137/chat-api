@@ -12,6 +12,7 @@ then
     git tag -a $version -m ""
   else
     echo "Invalid version '$version'. Should have the form vx.x.x[-<optional modifier>]. Aborting..."
+    exit 1
   fi
 
 fi
