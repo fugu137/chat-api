@@ -67,7 +67,7 @@ With the configuration in place, create two Postgres databases with matching cre
 this:
 
 <details>
-   <summary><u>(i) Run and set up the database yourself</u></summary>
+   <summary><u>Run and set up the database yourself</u></summary>
 
 1. Download and install [PostgreSQL](https://www.postgresql.org/download/) by following the instructions for your
    operating system. Version 15.2 is recommended, but other versions should work as well.
@@ -103,7 +103,7 @@ this:
 </details>
 
 <details>
-   <summary><u>(ii) Run the databases in Docker</u></summary>
+   <summary><u>Run the databases in Docker</u></summary>
 
 1. Install [Docker](https://docs.docker.com/get-docker/) if you don't already have it installed.
 2. Run the Gradle task `startDatabases`:
