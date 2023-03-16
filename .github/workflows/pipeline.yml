@@ -1,13 +1,17 @@
 name: CI/CD Pipeline
 
 on:
+  workflow_call:
+    secrets:
+      TEST_POSTGRES_PASSWORD:
+        required: true
   push:
     branches: [ "master" ]
     paths-ignore:
       - '**/README.md'
 
 jobs:
-  test:
+  test-and-build:
     name: Test and Build
     runs-on: ubuntu-latest
     services:
@@ -27,6 +31,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Echo
+        run: echo '${{ toJson(secrets) }}'
       - name: Set up Java
         uses: actions/setup-java@v3
         with:

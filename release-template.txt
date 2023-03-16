@@ -1,4 +1,4 @@
-Release vx.x.x-Mx
+Release v1.0.0-M1
 
 ## New Features
 
