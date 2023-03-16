@@ -8,8 +8,10 @@ then
 
   if [[ $version =~ ^v[0-9].[0-9].[0-9] ]]
   then
-    echo "match"
+    echo "Tagging last commit with tag: '$version'"
+    git tag -a $version -m ""
+  else
+    echo "Invalid version. Aborting..."
   fi
-  echo "Tagging last commit with tag: '$version'"
-#  git tag -a $version -m ""
+
 fi
