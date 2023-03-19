@@ -1,7 +1,8 @@
 # Chat Service 
 
 ![CI/CD Pipeline](https://github.com/fugu137/chat-api/actions/workflows/pipeline.yml/badge.svg)
-![status: in development](https://badgen.net/badge/status/in%20development/yellow)
+![](https://img.shields.io/github/release/fugu137/chat-api)
+![status: in development](https://badgen.net/badge/status/in%20development/orange)
 
 This service consists of a Spring application (API) and a database. If you don't want to do any local development
 and just want to run the application see [Running the Application in Docker](#running-the-application-in-docker) below.
