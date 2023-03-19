@@ -1,7 +1,6 @@
 # Chat Service 
 
 ![CI/CD Pipeline](https://github.com/fugu137/chat-api/actions/workflows/pipeline.yml/badge.svg)
-![release](https://badgen.net/github/release/fugu137/chat-api)
 ![status: in development](https://badgen.net/badge/status/in%20development/yellow)
 
 This service consists of a Spring application (API) and a database. If you don't want to do any local development
