@@ -4,9 +4,9 @@
 ![release](https://badgen.net/github/release/fugu137/chat-api)
 ![status: in development](https://badgen.net/badge/status/in%20development/yellow)
 
-The chat service consists of a Spring application (API) and a database. If you don't want to do any local development
-and
-just want to run the application see [Running the Application in Docker](#running-the-application-in-docker) below. If
+This service consists of a Spring application (API) and a database. If you don't want to do any local development
+and just want to run the application see [Running the Application in Docker](#running-the-application-in-docker) below.
+If
 you want to do local development, run tests, or have more control over how you run the application,
 see [Local Development](#local-development).
 
@@ -149,7 +149,7 @@ The integration tests can be run with the command:
 See [1. Setting up the databases](#1-setting-up-the-databases) for instructions on creating and configuring the test
 database.*
 
-Finally, if you want to run all of the tests, run:
+Finally, if you want to run all the tests, run:
 
 ```zsh
 ./gradlew check
